@@ -10,9 +10,9 @@
 
 static void delay()
 {
-    for (volatile uint32_t i = 0; i < 5000000; i++)
+    for (volatile uint32_t i = 0; i < 100000; i++)
     {
-        // becul albastru de pe board licare la fiecare vreo juma de minut
+        // becul albastru de pe board licare la fiecare vreo juma de minut*
     }
 }
 
