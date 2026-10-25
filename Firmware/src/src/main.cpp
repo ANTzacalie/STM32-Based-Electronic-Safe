@@ -21,17 +21,6 @@ int main()
     // 1. Enable clock pentru GPIOC
     // RCC_APB2ENR bit 4 = IOPCEN
     RCC_APB2ENR |= (1 << 4);
-
-    // 2. Configure PC13 ca General Purpose Output Push-Pull
-    //
-    // PC13 este în CRH.
-    // Fiecare pin are 4 biți:
-    //
-    // CNF13  = 00 -> General purpose push-pull
-    // MODE13 = 10 -> Output max 2 MHz
-    //
-    // PC13 => bits 23:20
-
     GPIOC_CRH &= ~(0xF << 20);
     GPIOC_CRH |=  (0x2 << 20);
 
