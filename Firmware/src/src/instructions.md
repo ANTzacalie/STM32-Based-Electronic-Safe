@@ -1,6 +1,6 @@
 
 
-* All about the APM32F103CBT6 / STM32F103CB Development Board*
+* All about the APM32F103CBT6 / STM32F103CB Microcontroller *
 
  ---------------------------
 | Peripheral | Base Address |
@@ -91,3 +91,32 @@
 | DMA1       | `ISR / IFCR`                     | Transfer status flags and flag clearing for each channel.                                |
 | DMA1       | `CCRx / CNDTRx / CPARx / CMARx`  | Channel configuration, number of transfers, peripheral address, and memory address.      |
  ------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+ * APM32F103CBT6 / STM32F103CB Microcontroller Development Board *
+
+ ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Dreapta                           | Funcție                                    | Stanga                        | Funcție                                      |
+|-----------------------------------|--------------------------------------------|-------------------------------|----------------------------------------------|
+| PB12 — pin 25                     | GPIO: port B, bit 12                       | GND                           | Masă, 0 V                                    |
+| PB13 — pin 26                     | GPIO: port B, bit 13                       | GND                           | Masă, 0 V                                    |
+| PB14 — pin 27                     | GPIO: port B, bit 14                       | 3V3                           | Alimentare 3,3 V                             |
+| PB15 — pin 28                     | GPIO: port B, bit 15                       | NRST / RST — pin 7            | Reset activ pe nivel LOW                     |
+| PA8 — pin 29                      | GPIO: port A, bit 8                        | PB11 — pin 22                 | GPIO: port B, bit 11                         |
+| PA9 — pin 30                      | GPIO: port A, bit 9                        | PB10 — pin 21                 | GPIO: port B, bit 10                         |
+| PA10 — pin 31                     | GPIO: port A, bit 10                       | PB1 — pin 19                  | GPIO: port B, bit 1                          |
+| PA11 — pin 32                     | GPIO: port A, bit 11; USB D−               | PB0 — pin 18                  | GPIO: port B, bit 0                          |
+| PA12 — pin 33                     | GPIO: port A, bit 12; USB D+               | PA7 — pin 17                  | GPIO: port A, bit 7                          |
+| PA15 / JTDI — pin 38              | GPIO: port A, bit 15; intrare date JTAG    | PA6 — pin 16                  | GPIO: port A, bit 6                          |
+| PB3 / JTDO / TRACESWO — pin 39    | GPIO: port B, bit 3; ieșire JTAG / trasare | PA5 — pin 15                  | GPIO: port A, bit 5                          |
+| PB4 / NJTRST — pin 40             | GPIO: port B, bit 4; reset JTAG activ LOW  | PA4 — pin 14                  | GPIO: port A, bit 4                          |
+| PB5 — pin 41                      | GPIO: port B, bit 5                        | PA3 — pin 13                  | GPIO: port A, bit 3                          |
+| PB6 — pin 42                      | GPIO: port B, bit 6                        | PA2 — pin 12                  | GPIO: port A, bit 2                          |
+| PB7 — pin 43                      | GPIO: port B, bit 7                        | PA1 — pin 11                  | GPIO: port A, bit 1                          |
+| PB8 — pin 45                      | GPIO: port B, bit 8                        | PA0 / WKUP — pin 10           | GPIO: port A, bit 0; intrare de trezire      |
+| PB9 — pin 46                      | GPIO: port B, bit 9                        | PC15 / OSC32_OUT — pin 4      | GPIO: port C, bit 15; ieșire OSC 32,768 kHz  |
+| 5V                                | Alimentare 5 V                             | PC14 / OSC32_IN — pin 3       | GPIO: port C, bit 14; intrare OSC 32,768 kHz |
+| GND                               | Masă, 0 V                                  | PC13 / TAMPER / RTC — pin 2   | GPIO: port C, bit 13; tamper / funcții RTC   |
+| 3V3                               | Alimentare 3,3 V                           | VBAT / VRTC — pin 1           | Alimentare RTC și registre de backup         |
+ ---------------------------------------------------------------------------------------------------------------------------------------------------------------
