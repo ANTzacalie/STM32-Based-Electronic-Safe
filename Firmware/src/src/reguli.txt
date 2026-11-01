@@ -1,0 +1,16 @@
+*** REGULI ***
+
+    1. Orice bucata de cod are comments, adica o explicatie cu ce face codul si pentru ce este folosit, in cazul in care este ceva complex, explicatua sa fie mai in detaliu;
+    2. Fiecare dintre noi avem o parte de facut specifica care initial nu este legata de celelalte, dar la final/testare vor fi, asa ca modul de 
+       lucru va fi cu clase/struct, de exemplu: 
+            - daca ai de facut ecranul, vei avea o clasa Ecran/Display cu initializarile necesare si functiile de control si handle necesare manipulari acestuia;
+            - daca ai de facut partea de sunet(buzzer), faci o classa numita Buzzer cu initializarile si functiile necesare de comanda etc;
+    3. Codul trebuie sa fie clar si nu incalcit;
+    4. Nu modifica codul altuia fara sa il informezi prin commit(ex: Modificat clasa Ecran/Mario), e de preferat sa nu facem asta in stagiile initiale;
+    5. Testarea codului sa face initial prin PlatformIo , in coltul dreapta sus sunt functiile de build/test/clean, ordinea recomandata este clean -> build/test;
+    6. ! Respectati lista pinilor alocati pentru partea voastra, ii gasiti in fisierul periferice_registri_pini.txt !;
+    7. Definitiile si denumirile sa fie cat mai clare, sa se inteleaga ce se face cu ele, chiar daca numele e lung, de preferat in limba engleza, dar puteti si in romana;
+    8. Fiecare componenta hardware are un datasheet, foarte important sa il citit!, deoarece pini fizici ai componentei vor necesita tensiuni specifice care microcontrollerul 
+       nu le poate da, acolo va fi necesar un tranzistor de comanda/alimentare separata!;
+    9. Simularea pe microcontroller se va face saptamanal la sfarsitul saptamani;
+
