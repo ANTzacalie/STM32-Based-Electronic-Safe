@@ -1,4 +1,33 @@
+* Conexiunile fizice ale componentelor la Microcontroller *
+ ---------------------------------------------------------------------------------------------------------------
+| Componentă        | Contact componentă     | Pin microcontroler | Configurare                                 |
+|-------------------|------------------------|--------------------|---------------------------------------------|
+| RC522             | SDA / SS / NSS         | PA4 — pin 14       | GPIO output; selectare activă LOW           |
+| RC522             | SCK                    | PA5 — pin 15       | SPI1_SCK                                    |
+| RC522             | MISO                   | PA6 — pin 16       | SPI1_MISO                                   |
+| RC522             | MOSI                   | PA7 — pin 17       | SPI1_MOSI                                   |
+| RC522             | RST                    | PB5 — pin 41       | GPIO output; reset activ LOW                |
+| RC522             | IRQ                    | Neconectat         | Opțional: PB15 — pin 28, pentru întreruperi |
+| OLED SSD1306      | SCL                    | PB6 — pin 42       | I2C1_SCL; funcție alternativă open-drain    |
+| OLED SSD1306      | SDA                    | PB7 — pin 43       | I2C1_SDA; funcție alternativă open-drain    |
+| Servo SG90        | Signal / PWM           | PA1 — pin 11       | TIM2_CH2; PWM la 50 Hz                      |
+| Buzzer 5 V        | Comandă etaj de putere | PB0 — pin 18       | GPIO sau TIM3_CH3; prin tranzistor          |
+| LED_OPEN — verde  | Anod, prin rezistor    | PA8 — pin 29       | GPIO output; HIGH = aprins                  |
+| LED_CLOSED — roșu | Anod, prin rezistor    | PB1 — pin 19       | GPIO output; HIGH = aprins                  |
+ ---------------------------------------------------------------------------------------------------------------
 
+
+ --------------------------------------------------------------------------
+| Contact tastatură | Rol în matrice | Taste asociate | Pin microcontroler |
+|-------------------|----------------|----------------|--------------------|
+| 1                 | Coloana C2     | 2, 5, 8, 0     | PB13 — pin 26      |
+| 2                 | Rândul R1      | 1, 2, 3        | PB8 — pin 45       |
+| 3                 | Coloana C1     | 1, 4, 7, *     | PB12 — pin 25      |
+| 4                 | Rândul R4      | *, 0, #        | PB11 — pin 22      |
+| 5                 | Coloana C3     | 3, 6, 9, #     | PB14 — pin 27      |
+| 6                 | Rândul R3      | 7, 8, 9        | PB10 — pin 21      |
+| 7                 | Rândul R2      | 4, 5, 6        | PB9 — pin 46       |
+ --------------------------------------------------------------------------
 
 * All about the APM32F103CBT6 / STM32F103CB Microcontroller *
 
