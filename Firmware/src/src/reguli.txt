@@ -5,6 +5,7 @@
        lucru va fi cu clase/struct, de exemplu: 
             - daca ai de facut ecranul, vei avea o clasa Ecran/Display cu initializarile necesare si functiile de control si handle necesare manipulari acestuia;
             - daca ai de facut partea de sunet(buzzer), faci o classa numita Buzzer cu initializarile si functiile necesare de comanda etc;
+            - loactia in proiect va fi mereu src/clasaA, src/src/ClasaB etc, fisierele de tip header vor fi puse in folderul src/include;
     3. Codul trebuie sa fie clar si nu incalcit;
     4. Nu modifica codul altuia fara sa il informezi prin commit(ex: Modificat clasa Ecran/Mario), e de preferat sa nu facem asta in stagiile initiale;
     5. Testarea codului sa face initial prin PlatformIo , in coltul dreapta sus sunt functiile de build/test/clean, ordinea recomandata este clean -> build/test;
@@ -13,4 +14,4 @@
     8. Fiecare componenta hardware are un datasheet, foarte important sa il citit!, deoarece pini fizici ai componentei vor necesita tensiuni specifice care microcontrollerul 
        nu le poate da, acolo va fi necesar un tranzistor de comanda/alimentare separata!;
     9. Simularea pe microcontroller se va face saptamanal la sfarsitul saptamani;
-
+    10. Nu se acepta lucrul cu librarie arduino, doar daca este o librarie pentru STM32;
