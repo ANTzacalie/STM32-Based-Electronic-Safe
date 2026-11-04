@@ -1,3 +1,6 @@
+
+
+
 * Conexiunile fizice ale componentelor la Microcontroller *
 
  Modulul RFID, Ecranul OLED, Servo, Buzzer si ledurile:
