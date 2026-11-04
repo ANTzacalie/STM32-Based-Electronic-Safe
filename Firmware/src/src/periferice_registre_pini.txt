@@ -1,5 +1,8 @@
 
-
+Vlad -> Keypadul
+Alex -> Logica led, buzzer si Servo
+Mario -> Display
+Antonio -> RFID / Alimentare / General
 
 * Conexiunile fizice ale componentelor la Microcontroller *
 
