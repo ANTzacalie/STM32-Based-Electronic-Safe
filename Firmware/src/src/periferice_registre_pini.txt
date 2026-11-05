@@ -1,8 +1,9 @@
 
-Vlad -> Keypadul
-Alex -> Logica led, buzzer si Servo
-Mario -> Display
-Antonio -> RFID / Alimentare / General
+* Impartirea proiectului pe 4 arii *
+1. Vlad -> Keypadul {INPUT}
+2. Alex -> Logica led, buzzer si Servo {CONTROL}
+3. Mario -> Display {AFISAJ}
+4. Antonio -> RFID / Alimentare / General {AUTH, VDD, STORAGE, GENERAL}
 
 * Conexiunile fizice ale componentelor la Microcontroller *
 
