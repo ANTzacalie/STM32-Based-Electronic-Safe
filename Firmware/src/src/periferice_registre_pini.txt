@@ -23,7 +23,7 @@
 | Buzzer 5 V        | Comandă etaj de putere | PB0 — pin 18       | GPIO sau TIM3_CH3; prin tranzistor          |
 | LED_OPEN — verde  | Anod, prin rezistor    | PA8 — pin 29       | GPIO output; HIGH = aprins                  |
 | LED_CLOSED — roșu | Anod, prin rezistor    | PB1 — pin 19       | GPIO output; HIGH = aprins                  |
-| RDT_BATT          | Punct-Mijloc-RDT       | PA2 - pin 11       | GPIO input -> ADC
+| RDT_BATT          | Punct-Mijloc-RDT       | PA2 - pin 11       | GPIO input -> ADC                           |
  ---------------------------------------------------------------------------------------------------------------
 
  Keypadul de tip matrice:
