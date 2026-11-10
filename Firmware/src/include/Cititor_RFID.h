@@ -23,9 +23,16 @@ class Cititor_RFID {
 
     public:
 
-        // Initializeaza modulul RFID.
-        void initialize();
+        // Initializeaza modul RFID,
+        /*
+          - Va configura comunicatia SPI cu MFRC522
+          - si registrele necesare functionarii cititorului.
+        */
+        Cititor_RFID() {
+          // de adaugat parametrii
+        }
 
+        uint8_t stocareCard();
         uint8_t verificaCard();
 
     private:

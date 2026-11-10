@@ -1,11 +1,11 @@
 
 #include "../include/Cititor_RFID.h"
 
+
 /*
- - Va configura comunicatia SPI cu MFRC522
- - si registrele necesare functionarii cititorului.
- */
-void Cititor_RFID::initialize()
+    - Va memora un nou card;
+*/
+uint8_t Cititor_RFID::stocareCard()
 {
     // TODO: Initializare SPI si MFRC522.
 }
@@ -16,6 +16,9 @@ void Cititor_RFID::initialize()
  */
 uint8_t Cititor_RFID::verificaCard()
 {
+
+
+    
    // ......
     return 0;
 }
