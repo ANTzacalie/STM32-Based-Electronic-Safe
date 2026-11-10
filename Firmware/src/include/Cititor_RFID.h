@@ -17,7 +17,8 @@
      0 - Card neautorizat sau eroare.
   - Adauga un nou card, inlocuindul pe cel vechi in memeorie;
     
- */
+*/
+
 class Cititor_RFID {
 
     public:
@@ -30,7 +31,7 @@ class Cititor_RFID {
     private:
 
     protected:
-    
+
 
 };
 
