@@ -18,14 +18,20 @@
   - Adauga un nou card, inlocuindul pe cel vechi in memeorie;
     
  */
-class Cititor_RFID
-{
-public:
+class Cititor_RFID {
 
-    // Initializeaza modulul RFID.
-    void initialize();
+    public:
 
-    uint8_t verificaCard();
+        // Initializeaza modulul RFID.
+        void initialize();
+
+        uint8_t verificaCard();
+
+    private:
+
+    protected:
+    
+
 };
 
 #endif // CITITOR_RFID_H
