@@ -1,7 +1,7 @@
 #include <stdint.h>
 
 
-int main() {
+int main(void) {
 
     // Begin
 
