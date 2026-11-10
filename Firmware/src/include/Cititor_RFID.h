@@ -5,6 +5,25 @@
 #include <stdint.h>
 
 /*
+ - O clasa enumerare pentru identificarea erorilor RFID.
+ - Fiecare valoare reprezinta o situatie care poate aparea in timpul functionarii cititorului.
+*/
+enum class EroareRFID : uint8_t
+{
+    NicioEroare = 0,       // Functionare normala.
+    InitializareEsuata,    // MFRC522 nu a fost initializat.
+    EroareSPI,             // Comunicare SPI esuata.
+    Timeout,               // Cititorul nu raspunde la timp.
+    CardAbsent,            // Nu exista card detectat.
+    AutentificareEsuata,   // Autentificarea Crypto1 a esuat.
+    CardNeautorizat,       // Cardul nu este cel inregistrat.
+    EroareCitire,          // Citirea cardului a esuat.
+    EroareScriere,         // Scrierea cardului a esuat.
+    EroareFlash            // Eroare la salvarea in memoria MCU.
+};
+
+
+/*
   - Clasa Cititor_RFID
  
   - Gestioneaza comunicarea cu modulul MFRC522
@@ -35,7 +54,21 @@ class Cititor_RFID {
         uint8_t stocareCard();
         uint8_t verificaCard();
 
+        // Returneaza ultima eroare inregistrata
+        EroareRFID getUlrimaEroare() const 
+        {
+          return ultimaEroare;
+        }
+
+        // Gestioneaza ultima eroare aparuta, returnand tipul erorii;
+        EroareRFID handleEroare();
+
     private:
+        
+        EroareRFID ultimaEroare = EroareRFID::NicioEroare;
+
+        // Inregistreaza o eroare noua, folosita doar de clasa intern;
+        void setEroare(EroareRFID eroare);
 
     protected:
 
