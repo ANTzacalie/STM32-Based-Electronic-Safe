@@ -131,7 +131,7 @@ void Cititor_RFID::initializareSPI()
     hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
     hspi1.Init.CRCPolynomial = 7; // val de configurare, neutilizata;
 
-    // Aplicam configuratia si verificam rezultatul;
+    // Aplicam configuratia pe registrele SPI1 cu HAL si verificam rezultatul;
     if(HAL_SPI_Init(&hspi1) != HAL_OK) // daca HAL_SPI_Init nu intoarce HAL_OK la configuratia hspi1, inseamna ca SPI1 a esuat;
     {
         setEroare(EroareRFID::InitializareEsuata);
