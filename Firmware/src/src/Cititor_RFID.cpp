@@ -72,6 +72,71 @@ void Cititor_RFID::initializarePini()
 }
 
 /*
+  - Conform datasheetulil MFRC522, sectiunea 8.1.2, cititorul comunica prin SPI
+  si functioneaza ca Slave, Microcontrollerul fiind necesar sa fie Master, adica el controleaza comunicatia.
+
+  - Initializarea perifericului SPI1.
+  - Configureaza SPI1 in modul Master,
+  pentru comunicarea cu MFRC522.
+
+  [Parametru] [Valoare]	[Explicație]
+   Mode	       MASTER	 MCU controlează comunicația
+   Direction   2LINES	 Transmitere și recepție
+   DataSize	   8BIT	     Transferăm câte 8 biți
+   CPOL	       LOW	     Ceasul este LOW în repaus
+   CPHA	       1EDGE	 Citirea pe primul front
+   NSS	       SOFT	     Controlăm manual PA4
+   Prescaler   16	     Divizăm frecvența SPI
+   FirstBit	   MSB	     Transmitem bitul cel mai semnificativ primul
+
+- CPOL = 0 și CPHA = 0 reprezintă SPI Mode 0, compatibil cu MFRC522.
+
+*/
+void Cititor_RFID::initializareSPI()
+{
+
+    // Activam ceasul pentru perifericul SPI1;
+    __HAL_RCC_SPI1_CLK_ENABLE();
+
+    // Selectam perifericul SPI1 in hspi;
+    hspi1.Instance = SPI1;
+
+    // Punem microcontrollerul ca master;
+    hspi1.Init.Mode = SPI_MODE_MASTER;
+
+    // Transmitem si receptionam date pe 8 biti(1 byte);
+    hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+
+    // SPI Mode 0 -> CPOL = 0, CPHA = 0;
+    hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+    hspi1.Init.CLKPhase    = SPI_PHASE_1EDGE;
+
+    // Controlam manual NSS pron GPIO PA4;
+    hspi1.Init.NSS = SPI_NSS_SOFT;
+
+    // Frecventa SPI = PCLK2 / 16;
+    hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+
+    // Transmitem mai intai bitul cel mai semnificativ MSB;
+    hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+
+    // Dezactivam protocolul TI;
+    hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+
+    // Nu folosim CRC hardware pentru transferul SPI, asa ca il dezactivam;
+    hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+    hspi1.Init.CRCPolynomial = 7;
+
+    // Aplicam configuratia si verificam rezultatul;
+    if(HAL_SPI_Init(&hspi1) != HAL_OK) // daca HAL_SPI_Init nu intoarce HAL_OK la configuratia hspi1, inseamna ca SPI1 a esuat;
+    {
+        setEroare(EroareRFID::InitializareEsuata);
+    }
+    
+}
+
+
+/*
     - Va memora un nou card;
 */
 uint8_t Cititor_RFID::stocareCard()
