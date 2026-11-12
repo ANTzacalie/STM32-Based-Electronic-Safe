@@ -16,6 +16,9 @@ Cititor_RFID::Cititor_RFID()
  * Configureaza pinii GPIO ai modulului MFRC522:
    - PA4 - NSS (Slave Select), activ LOW.
    - PB5 - RESET, activ LOW.
+   - PA5 - SCK:  Clock generat de microcontroller.
+   - PA6 - MISO: Date primite de la MFRC522.
+   - PA7 - MOSI: Date trimise catre MFRC522.
 */
 void Cititor_RFID::initializarePini()
 {
@@ -46,6 +49,26 @@ void Cititor_RFID::initializarePini()
 
     // Setam cu HAL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    // Pentru interfata SPI;
+    GPIO_InitTypeDef SPI_GPIO_Init = {};
+
+    // PA5 si PA7 sunt iesiri controlat de perifericul SPI_1;
+    // Merg ambii initializati deodata pt ca sunt din acelasi port(A);
+    SPI_GPIO_Init.Pin   = GPIO_PIN_5 | GPIO_PIN_7;
+    SPI_GPIO_Init.Mode  = GPIO_MODE_AF_PP; // push_pull
+    SPI_GPIO_Init.Speed = GPIO_SPEED_FREQ_HIGH; // viteza mare
+
+    // Aplicam configuratia pentru pa5&7;
+    HAL_GPIO_Init(GPIOA, &SPI_GPIO_Init);
+
+    // PA6 este intrare;
+    SPI_GPIO_Init.Pin  = GPIO_PIN_6;
+    SPI_GPIO_Init.Mode = GPIO_MODE_INPUT;
+    SPI_GPIO_Init.Pull = GPIO_NOPULL;
+
+    // Aplicam configuratia pentru PA6;
+    HAL_GPIO_Init(GPIOA, &SPI_GPIO_Init);
 
 }
 
