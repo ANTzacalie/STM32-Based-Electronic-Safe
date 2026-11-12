@@ -24,7 +24,7 @@ enum class EroareRFID : uint8_t
     EroareScriere,         // RFID: Scrierea cardului a esuat.
     EroareFlash,           // RFID: Eroare la salvarea in memoria MCU.
     OperatieNeimplementata // RFID: NU EXISTA OPERATIA.
-};
+}; // OBS: HAL_OK nu inseamna ca transferul SPI a fost executat, nu garanteaza ca MFRC522 a raspuns corect, de aceea mereu verificam rezultatul cat putem de bine;
 
 
 /*
