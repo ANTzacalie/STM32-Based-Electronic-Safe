@@ -8,7 +8,7 @@
 
 int main(void) {
 
-    // Initializare cititor MFRS522;
+    // Initializare cititor MFRC522;
     Cititor_RFID cititor_mfrs522;
 
     //.....

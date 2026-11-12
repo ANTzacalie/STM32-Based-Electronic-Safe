@@ -2,24 +2,28 @@
 #ifndef CITITOR_RFID_H
 #define CITITOR_RFID_H
 
+// libraria HAL pentru familia STM32F100+ 
+#include "stm32f1xx_hal.h"
 #include <stdint.h>
 
 /*
  - O clasa enumerare pentru identificarea erorilor RFID.
  - Fiecare valoare reprezinta o situatie care poate aparea in timpul functionarii cititorului.
 */
+
 enum class EroareRFID : uint8_t
 {
-    NicioEroare = 0,       // Functionare normala.
-    InitializareEsuata,    // MFRC522 nu a fost initializat.
-    EroareSPI,             // Comunicare SPI esuata.
-    Timeout,               // Cititorul nu raspunde la timp.
-    CardAbsent,            // Nu exista card detectat.
-    AutentificareEsuata,   // Autentificarea Crypto1 a esuat.
-    CardNeautorizat,       // Cardul nu este cel inregistrat.
-    EroareCitire,          // Citirea cardului a esuat.
-    EroareScriere,         // Scrierea cardului a esuat.
-    EroareFlash            // Eroare la salvarea in memoria MCU.
+    NicioEroare = 0,       // RFID: Functionare normala.
+    InitializareEsuata,    // RFID: MFRC522 nu a fost initializat.
+    EroareSPI,             // RFID: Comunicare SPI esuata.
+    Timeout,               // RFID: Cititorul nu raspunde la timp.
+    CardAbsent,            // RFID: Nu exista card detectat.
+    AutentificareEsuata,   // RFID: Autentificarea Crypto1 a esuat.
+    CardNeautorizat,       // RFID: Cardul nu este cel inregistrat.
+    EroareCitire,          // RFID: Citirea cardului a esuat.
+    EroareScriere,         // RFID: Scrierea cardului a esuat.
+    EroareFlash,           // RFID: Eroare la salvarea in memoria MCU.
+    OperatieNeimplementata // RFID: NU EXISTA OPERATIA.
 };
 
 
@@ -44,12 +48,11 @@ class Cititor_RFID {
 
         // Initializeaza modul RFID,
         /*
-          - Va configura comunicatia SPI cu MFRC522
-          - si registrele necesare functionarii cititorului.
+          - Va configura porturile(perifericele) necesare MFRC522;
+          - Va configura comunicatia SPI cu MFRC522;
+          - si registrele necesare functionarii cititorului;
         */
-        Cititor_RFID() {
-          // de adaugat parametrii
-        }
+        Cititor_RFID();
 
         uint8_t stocareCard();
         uint8_t verificaCard();
@@ -65,6 +68,7 @@ class Cititor_RFID {
 
     private:
         
+        void initializarePini();
         EroareRFID ultimaEroare = EroareRFID::NicioEroare;
 
         // Inregistreaza o eroare noua, folosita doar de clasa intern;

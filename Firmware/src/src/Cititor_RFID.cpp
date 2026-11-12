@@ -2,6 +2,28 @@
 #include "../include/Cititor_RFID.h"
 
 
+
+
+// Se executa utomat la creearea unui obiect de tip Cititor_RFID
+Cititor_RFID::Cititor_RFID() 
+{
+
+    initializarePini();
+
+}
+
+/*
+ * Configureaza pinii GPIO ai modulului MFRC522:
+   - PA4 - NSS (Slave Select), activ LOW.
+   - PB5 - RESET, activ LOW.
+ */
+void Cititor_RFID::initializarePini()
+{
+
+    
+
+}
+
 /*
     - Va memora un nou card;
 */
