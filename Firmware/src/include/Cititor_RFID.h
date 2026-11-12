@@ -68,7 +68,17 @@ class Cititor_RFID {
 
     private:
         
+        // initializare pini prin HAl;
         void initializarePini();
+
+        // Structura speciala definita in HAL, care contine info necesare administrari SPI;
+        // Handle HAL pentru perifericul SPI si starea comunicatiei cu modulul MRFC522;
+        SPI_HandleTypeDef hspi1 = {};
+
+        // initializare spi1 prin HAL;
+        void initializareSPI();
+
+        // instanta eroare cu ultima eroare = 0 (default)
         EroareRFID ultimaEroare = EroareRFID::NicioEroare;
 
         // Inregistreaza o eroare noua, folosita doar de clasa intern;

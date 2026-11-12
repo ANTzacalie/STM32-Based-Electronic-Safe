@@ -2,8 +2,6 @@
 #include "../include/Cititor_RFID.h"
 
 
-
-
 // Se executa utomat la creearea unui obiect de tip Cititor_RFID
 Cititor_RFID::Cititor_RFID() 
 {
