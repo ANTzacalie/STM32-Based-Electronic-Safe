@@ -139,6 +139,82 @@ void Cititor_RFID::initializareSPI()
 
 }
 
+/*
+  - Citeste un registru intern al MFRC522.
+  - Comunicatia foloseste SPI1 si NSS controlat manual.
+ */
+bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val) 
+{
+
+    /*
+       Formatul adresei SPI pentru citire:
+      
+       Bit 7    = 1 (operatie READ)
+       Biti 6:1 = adresa registrului
+       Bit 0    = 0
+
+    */
+   // Buffer pentru datele transmise;
+    uint8_t dateTrimise[2] ={
+
+        static_cast<uint8_t>(0x80 | ((reg & 0x3F) << 1)), 0x00
+
+    };
+
+    // Buffer pentru datele receptionate;
+    uint8_t datePrimite[2] = {0};
+
+    // Selectam MFRC522: NSS activ LOW'
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+
+    /*
+      Trimitem doi octeti:
+      1. Adresa registrului.
+      2. Octet "dummy" pentru a genera ceasul SPI necesar receptionarii valorii registrului.
+    
+     DIN HAL:
+     Transmit and Receive an amount of data in blocking mode.
+
+     Parameters:
+        hspi – pointer to a SPI_HandleTypeDef structure that contains the configuration information for SPI module.
+        pTxData – pointer to transmission data buffer
+        pRxData – pointer to reception data buffer
+        Size – amount of data to be sent and received
+        Timeout – Timeout duration
+
+     Return values:
+     HAL status
+    */
+    HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(
+        &hspi1, // adm. SPI
+        dateTrimise,
+        datePrimite,
+        2, // 2 bytes
+        100 // 100ms timeout
+    );
+
+    // Incheiem tranzactia SPI: NSS devine HIGH;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+
+    // Verificam daca transferul SPI a esuat;
+    if(status != HAL_OK) {
+        
+        if(status == HAL_TIMEOUT) 
+            setEroare(EroareRFID::Timeout);
+        else setEroare(EroareRFID::EroareSPI);
+
+        return false;
+    }
+
+    // Al doilea octet(byte) contine valoarea registrului;
+    val = datePrimite[1];    
+
+    // Transferul SPI sa executat cu succes;
+    setEroare(EroareRFID::NicioEroare);
+
+    return true;
+
+}
 
 /*
     - Va memora un nou card;

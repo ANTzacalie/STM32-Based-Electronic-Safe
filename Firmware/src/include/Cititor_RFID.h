@@ -66,7 +66,18 @@ class Cititor_RFID {
         // Gestioneaza ultima eroare aparuta, returnand tipul erorii;
         EroareRFID handleEroare();
 
+        // returneaza versiunea hardware a MFRC522 gasita, returneaza zero daca SPI esueaza;
+        uint8_t citesteVersiune(); 
+
     private:
+
+        /*
+          - Citeste un registru intern al MFRC522 prin SPI
+          Are doi paramatrii:
+            1. Adresa registrului;
+            2. Variabila in care salvam rezultatul;
+        */        
+        bool citireRegistru(uint8_t reg, uint8_t &val);
         
         // initializare pini prin HAl;
         void initializarePini();
