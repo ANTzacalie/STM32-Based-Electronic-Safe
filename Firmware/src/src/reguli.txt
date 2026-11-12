@@ -15,7 +15,7 @@
        nu le poate da, acolo va fi necesar un tranzistor de comanda/alimentare separata!;
     9. Simularea pe microcontroller se va face saptamanal la sfarsitul saptamani;
     10. Nu se acepta lucrul cu librarie arduino, doar daca este o librarie pentru STM32(HAL);
-    11. Se lucreaza in genral pe registre!;
+    11. Se lucreaza in genral pe HAL si registre!;
 
 *** // STAGI DE EXECUTARE PROIECT // ***
 
