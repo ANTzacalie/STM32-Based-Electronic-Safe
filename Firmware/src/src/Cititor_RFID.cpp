@@ -34,10 +34,10 @@ void Cititor_RFID::initializarePini()
     // Configutam GPIO_InitStruct cu setarile PIN_4 ca iesire digitala;
     GPIO_InitStruct.Pin   = GPIO_PIN_4;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP; // Push-Pull
-    GPIO_InitStruct.Pull  = GPIO_NOPULL; 
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;  // Nu activam rezistente de pull-up/pull-down;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 
-    // Setam folosind HAL configuratia pentru PA4 pe portul A;
+    // Setam folosind HAL in registrele GPIO ale MICROCONTROLLERULUI configuratia pentru PA4 pe portul A;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     // Configuram PB5 la fel ca si PA4, iesire digitala;
