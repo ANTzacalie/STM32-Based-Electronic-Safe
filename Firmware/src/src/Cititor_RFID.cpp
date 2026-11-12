@@ -6,7 +6,11 @@
 Cititor_RFID::Cititor_RFID() 
 {
 
+    // conf. pini necesari mfrc522
     initializarePini();
+
+    // configurare periferic SPI1
+    initializareSPI();
 
 }
 
@@ -125,14 +129,14 @@ void Cititor_RFID::initializareSPI()
 
     // Nu folosim CRC hardware pentru transferul SPI, asa ca il dezactivam;
     hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    hspi1.Init.CRCPolynomial = 7;
+    hspi1.Init.CRCPolynomial = 7; // val de configurare, neutilizata;
 
     // Aplicam configuratia si verificam rezultatul;
     if(HAL_SPI_Init(&hspi1) != HAL_OK) // daca HAL_SPI_Init nu intoarce HAL_OK la configuratia hspi1, inseamna ca SPI1 a esuat;
     {
         setEroare(EroareRFID::InitializareEsuata);
     }
-    
+
 }
 
 
