@@ -95,6 +95,7 @@ void Cititor_RFID::initializarePini()
 
 - CPOL = 0 și CPHA = 0 reprezintă SPI Mode 0, compatibil cu MFRC522.
 
+SPI FULL DUPLEX
 */
 void Cititor_RFID::initializareSPI()
 {
@@ -142,6 +143,9 @@ void Cititor_RFID::initializareSPI()
 /*
   - Citeste un registru intern al MFRC522.
   - Comunicatia foloseste SPI1 si NSS controlat manual.
+  - Intr-o citire de registru, primul octet transmis este 
+  adresa, iar al doilea generează impulsurile de ceas necesare 
+  pentru primirea datelor. Primul octet recepționat este ignorat.
  */
 bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val) 
 {
@@ -214,6 +218,34 @@ bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val)
 
     return true;
 
+}
+
+/*
+ - Citeste registrul VersionReg (adresa 0x37)
+ - pentru identificarea cititorului MFRC522.
+
+    Va returna conform doc. NXP:
+        1.0x91 pentru MFRC522 V1.0;
+        2.0x92 pentru MFRC522 V2.0;
+*/
+uint8_t Cititor_RFID::citesteVersiune() {
+
+    uint8_t versiune = 0;
+
+    // Executam citirea registrului VersionReg;
+    if(!citireRegistru(0x37, versiune)) 
+    {
+        // eroarea spi a fost deja inreg etc...;
+        return 0;
+    }
+
+    if(versiune != 0x91 && versiune != 0x92)
+    {
+        setEroare(EroareRFID::InitializareEsuata);
+    }
+
+    return versiune;
+    
 }
 
 /*
