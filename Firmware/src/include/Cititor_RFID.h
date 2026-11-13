@@ -69,6 +69,9 @@ class Cititor_RFID {
         // returneaza versiunea hardware a MFRC522 gasita, returneaza zero daca SPI esueaza;
         uint8_t citesteVersiune(); 
 
+        // testeaza comunicatia SPI prin scriere si citire.
+        uint8_t testComunicareSPI();
+
     private:
 
         /*
@@ -94,6 +97,9 @@ class Cititor_RFID {
 
         // Inregistreaza o eroare noua, folosita doar de clasa intern;
         void setEroare(EroareRFID eroare);
+
+        // Scrie un octet intr-un registru MFRC522.
+        bool scriereRegistru(uint8_t registru, uint8_t valoare);
 
     protected:
 
