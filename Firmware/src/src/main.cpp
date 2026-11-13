@@ -33,7 +33,7 @@ int main(void)
     while (true)
     {
         
-        HAL_Delay(500);
+        // MAIN LOOP
  
     }
 
