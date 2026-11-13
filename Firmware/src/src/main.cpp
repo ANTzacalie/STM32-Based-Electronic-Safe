@@ -26,19 +26,15 @@ int main(void)
     // Asteptam stabilizarea cititorului RFID.
     HAL_Delay(100);
 
-    // Citim registrul VersionReg al MFRC522.
+    // Citim registrul VersionReg al MFRC522, volatile type utilizat pentru a vedea in debugger;
     volatile uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune();
-
-    if (versiuneRFID == 0x91 || versiuneRFID == 0x92 || versiuneRFID == 0x82)
-    {
-       HAL_Delay(10);
-    }
 
     // Bucla principala.
     while (true)
     {
         
-            HAL_Delay(500);
+        HAL_Delay(500);
  
     }
+
 }
