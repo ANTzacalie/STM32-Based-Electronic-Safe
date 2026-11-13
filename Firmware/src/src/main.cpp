@@ -1,34 +1,44 @@
 #include <Cititor_RFID.h>
 #include <stdint.h>
 
-
-
-
-
-
-int main(void) {
-
-    // Initializam infrastructura HAL mai intai de toate;
-    HAL_Init();
-
-    // Initializare cititor MFRC522;
-    Cititor_RFID cititor_mfrc522;
-
-    // Permite stabilizarea cititorului dupa alimentare, intre 100 si 200ms;
-    HAL_Delay(100);
-
-    // Citim versiunea MFRC522;
-    uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune();
-    // afisare pe USART1;
-    
 /*
-    // Bucla Principala!
-    while (true)
-    {
-       
-    }
-    
-*/
-
+ - Handler pentru intreruperea SysTick.
+ - HAL_IncTick() incrementeaza contorul HAL
+ - utilizat de HAL_Delay() si de timeout-uri.
+ - daca nu lam declara, HAL_Delay poate sa nu se mai termine niciodata
+ 
+ - extern "C" permite identificarea corecta a functiei de catre codul startup.
+ */
+extern "C" void SysTick_Handler(void)
+{
+    HAL_IncTick();
 }
 
+
+int main(void)
+{
+    // Initializam infrastructura HAL.
+    HAL_Init();
+
+    // Initializare clasa cititor;
+    Cititor_RFID cititor_mfrc522;
+
+    // Asteptam stabilizarea cititorului RFID.
+    HAL_Delay(100);
+
+    // Citim registrul VersionReg al MFRC522.
+    volatile uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune();
+
+    if (versiuneRFID == 0x91 || versiuneRFID == 0x92 || versiuneRFID == 0x82)
+    {
+       HAL_Delay(10);
+    }
+
+    // Bucla principala.
+    while (true)
+    {
+        
+            HAL_Delay(500);
+ 
+    }
+}

@@ -227,6 +227,7 @@ bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val)
     Va returna conform doc. NXP:
         1.0x91 pentru MFRC522 V1.0;
         2.0x92 pentru MFRC522 V2.0;
+        3.Pot fi si alti bytes, precum 0x82(Clona) etc....
 */
 uint8_t Cititor_RFID::citesteVersiune() {
 
