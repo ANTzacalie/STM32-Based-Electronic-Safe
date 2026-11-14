@@ -483,6 +483,7 @@ bool Cititor_RFID::activareAntena()
  - Detecteaza un card ISO14443A prin comanda REQA.
  - Foloseste FIFO-ul si motorul Transceive al MFRC522.
  - *Nu folosim pinul IRQ, ci verificam ComIrqReg.
+ - Toate registrele sunt incarcate cu comenzi conform datasheet, pagina 70, tabelul 149;
 */
 
 uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2]) 
@@ -505,13 +506,96 @@ uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2])
        !scriereRegistru(0x0A, 0x80) || // Golim FIFO
        !scriereRegistru(0x09, 0x26) || // REQA
        !scriereRegistru(0x0D, 0x07) || // Transmitem 7 biti
-       !scriereRegistru(0x01, 0x0C) || // state Transceive
-       !scriereRegistru(0x0D, 0x87)) // Incepem trimiterea(StartSend)
+       !scriereRegistru(0x01, 0x0C) || // state Transceive(0x0C)              | comanda 0x0C si bitul StartSend,
+       !scriereRegistru(0x0D, 0x87))   // Incepem trimiterea(bitul StartSend) | pentru a porni transmisia radio;
     {
         return 0;
     }
 
+    /*
+     - Asteptam raspunsul cardului, maximum 30 ms conform datasheet;
+     
+     - ComIrqReg:
+        -> bit 5 = RxIRq (raspuns receptionat)
+        -> bit 1 = ErrIRq (eroare)
+        -> bit 0 = TimerIRq (timeout hardware)
+    */
+    uint8_t irq = 0;
+    bool raspunsPrimit = false;
+    bool comunicatieOK = true;
+
+    uint32_t timpStart = HAL_GetTick(); // ne intoarce timpul curent in ms;
+
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        // nu sa putu citi registrul irq;
+        if (!citireRegistru(0x04, irq))
+        {
+            comunicatieOK = false;
+            break;
+        }
+
+        // sa primit raspunsul;
+        if (irq & 0x20)
+        {
+            raspunsPrimit = true;
+            break;
+        }
+
+        // intrerupere / fail;
+        if (irq & 0x03)
+        {
+            break;
+        }
+    }
+
+    // Oprim mai intai transmisia si revenim la Idle;
+    if(!scriereRegistru(0x0D, 0x07) || !scriereRegistru(0x01, 0x00))
+    {
+        return 0;
+    }
+
+    if(!comunicatieOK)
+        return 0;
     
+    if(!raspunsPrimit)
+    {
+        if(irq & 0x02) 
+            EroareRFID::EroareCitire;
+        else 
+            EroareRFID::CardAbsent;
+        
+        return 0;
+    }
 
+    // Verificam erorile si lungimea raspunsului;
+    uint8_t erori    = 0;
+    uint8_t nrOcteti = 0;
+    uint8_t control  = 0;
 
-}
+    if(!citireRegistru(0x06, erori) || !citireRegistru(0x0A, nrOcteti) || !citireRegistru(0x0C, control))
+    {
+        return 0;
+    }
+
+    /*
+     - ATQA trebuie sa aiba exact 16 biti:
+       -> 2 octeti in FIFO
+       -> 0 biti suplimentari in ultimul octet.
+    */
+    if((erori & 0x1B) != 0 || nrOcteti != 2 || (control & 0x07) != 0)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Citim cei doi octeti ATQA din FIFO;
+    if(!citesteRegistruTest(0x09, atqa[0]) || !citesteRegistruTest(0x09, atqa[1]))
+    {
+        return 0;
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
+
+}   
