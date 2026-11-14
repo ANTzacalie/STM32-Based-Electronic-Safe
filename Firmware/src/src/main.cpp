@@ -23,7 +23,6 @@ void MFRC522_RFID_INIT() {
 
     // Asteptam stabilizarea cititorului RFID.
     HAL_Delay(100);
-
     
     // ############ TEST ############# //
 

@@ -71,7 +71,18 @@ class Cititor_RFID {
         // testeaza comunicatia SPI prin scriere si citire.
         uint8_t testComunicareSPI();
 
+        // citeste registrul specifica, *doar pt teste;
         uint8_t citesteRegistruTest(uint8_t reg);
+
+        /*
+         - Mai multe informatii in .cpp;
+         - Trimite REQA si asteapta ATQA.
+         - atqa - buffer pentru cei doi octeti receptionati.
+         - Returneaza:
+           -> 1 - Card detectat si raspuns ATQA valid.
+           -> 0 - Card absent sau eroare.
+        */
+        uint8_t detecteazaCard(uint8_t atqa[2]);
 
     private:
 

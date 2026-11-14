@@ -16,6 +16,12 @@ Cititor_RFID::Cititor_RFID()
     if(getUltimaEroare() == EroareRFID:: NicioEroare)
     {
         activareAntena();
+        /*
+        - TxASKReg (0x15), bitul 6:
+        activam modulatia 100% ASK pentru comunicarea Type A.
+        - Conform datasheet pagina 51;
+        */
+        scriereRegistru(0x15, 0x40);
     }
 
 }
@@ -441,7 +447,7 @@ bool Cititor_RFID::activareAntena()
             Inainte:   1000 0000   (0x80)
             Masca:     0000 0011   (0x03)
                        ---------
-            Rezultat:  1000 0011   (0x83)
+            Rezultat:  1000 0011   (0x83), sa facut efectiv operatia SAU pe biti;
         */
         valoareRegistru |= mascaActivareRF;
         
@@ -467,5 +473,45 @@ bool Cititor_RFID::activareAntena()
     }
 
     return true;
+
+}
+
+/*
+ REQA solicită răspunsul unui card ISO/IEC 14443 Type A aflat în câmpul antenei.
+ REQA = 0x26, transmis pe 7 biți, cardul RFID răspunde prin ATQA, care conține 2 octeți.
+ 
+ - Detecteaza un card ISO14443A prin comanda REQA.
+ - Foloseste FIFO-ul si motorul Transceive al MFRC522.
+ - *Nu folosim pinul IRQ, ci verificam ComIrqReg.
+*/
+
+uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2]) 
+{
+
+    // Initializam bufferul de raspuns;
+    atqa[0] = 0; // oct 1
+    atqa[1] = 0; // oct 2
+
+    /*
+      Pregatirea transmisiei conform cu datasheetul MFRC522, reg_init:
+        1. CommandReg    = 0x01
+        2. ComIrqReg     = 0x04
+        3. FIFODataReg   = 0x09
+        4. FIFOLevelReg  = 0x0A
+        5. BitFramingReg = 0x0D
+    */
+    if(!scriereRegistru(0x01, 0x00) || // state Idle
+       !scriereRegistru(0x04, 0x7F) || // Stergem IRQ vechi
+       !scriereRegistru(0x0A, 0x80) || // Golim FIFO
+       !scriereRegistru(0x09, 0x26) || // REQA
+       !scriereRegistru(0x0D, 0x07) || // Transmitem 7 biti
+       !scriereRegistru(0x01, 0x0C) || // state Transceive
+       !scriereRegistru(0x0D, 0x87)) // Incepem trimiterea(StartSend)
+    {
+        return 0;
+    }
+
+    
+
 
 }
