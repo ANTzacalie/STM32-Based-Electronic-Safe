@@ -45,16 +45,26 @@ void MFRC522_RFID_INIT() {
     {
         // Verificam periodic prezenta unui card_rfid //
 
-        // Buffer pentru raspunsul ATQA;
+        // Buffer pentru raspunsurile RFID;
         uint8_t atqa[2] = {0};
+        uint8_t uidCL1[5] = {0};
 
-        // 1 = raspuns valid, 0 = card absent/eroare;
+        // pas1. detectam cardul prin REQA 1 = raspuns valid, 0 = card absent/eroare;
         volatile uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
 
-        // Salvam octetii separat pentru debugger;
-        volatile uint8_t atqa0 = atqa[0];
-        volatile uint8_t atqa1 = atqa[1];
+        // pas2. obtinem identificatorul CL1;
+        volatile uint8_t uidCitit = 0;
+        if(cardDetectat == 1)
+            uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
 
+        // Citim rezultatele pentru debug;
+        volatile uint8_t uid0 = uidCL1[0];
+        volatile uint8_t uid1 = uidCL1[1];
+        volatile uint8_t uid2 = uidCL1[2];
+        volatile uint8_t uid3 = uidCL1[3];
+        volatile uint8_t uid4 = uidCL1[4];
+        
+        // verificam ultima eroare;
         volatile EroareRFID err2 = cititor_mfrc522.getUltimaEroare();
         // breakpoint
         __NOP();
