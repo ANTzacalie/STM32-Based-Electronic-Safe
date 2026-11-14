@@ -85,8 +85,6 @@ class Cititor_RFID {
         */
         uint8_t detecteazaCard(uint8_t atqa[2]);
 
-        
-
     private:
 
         // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;

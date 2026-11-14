@@ -15,6 +15,7 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
+/////////////////////// MFRC522 RFID ///////////////////////
 void MFRC522_RFID_INIT() {
 
     // Initializare clasa cititor;
@@ -65,6 +66,7 @@ void MFRC522_RFID_INIT() {
     // ############ TEST ############# //
 
 }
+/////////////////////// MFRC522 RFID ///////////////////////
 
 int main(void)
 {
