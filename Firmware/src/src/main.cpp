@@ -31,6 +31,9 @@ int main(void)
     // Citim registrul VersionReg al MFRC522, volatile type utilizat pentru a vedea in debugger;
     volatile uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune(); // 0x92 | 0x91 | 0x82 | 0x90 | 0x88 | 0x89 | 0xB2 | 0x12[CIP-FALS]
 
+    // Executam testul SPI o singura data;
+    volatile uint8_t rezultatSPI = cititor_mfrc522.testComunicareSPI(); 
+
 //////////////////////////////////// MFRC522_RFID ////////////////////////////////////
 
 

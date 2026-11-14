@@ -205,7 +205,8 @@ bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val)
         
         if(status == HAL_TIMEOUT) 
             setEroare(EroareRFID::Timeout);
-        else setEroare(EroareRFID::EroareSPI);
+        else 
+            setEroare(EroareRFID::EroareSPI);
 
         return false;
     }
@@ -215,6 +216,44 @@ bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val)
 
     // Transferul SPI sa executat cu succes;
     setEroare(EroareRFID::NicioEroare);
+
+    return true;
+
+}
+
+
+/*
+    - Scrie o valoare intrun registru MFRC522,
+    - Formatul SPI -> bit 7 = 0 pentru WRITE, biti 6:1 = adresa, bit 0 = 0.
+*/
+bool Cititor_RFID::scriereRegistru(uint8_t reg, uint8_t val) 
+{
+
+    uint8_t date[2] = {
+        static_cast<uint8_t>((reg & 0x3F) << 1), val
+    };    
+
+    // Selectam cititorul: NSS = LOW;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+
+    // Trimitem adresa si valoarea registrului;
+    HAL_StatusTypeDef status = HAL_SPI_Transmit(&hspi1, date, 2, 100); // size 2bytes 100ms tran. timeout
+
+    // Eliberam cititorul: NSS = HIGH;
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+
+    // Verificam rezultatul transferului catre MFRC522;
+    if(status != HAL_OK) 
+    {
+
+        if(status == HAL_TIMEOUT)
+            setEroare(EroareRFID::Timeout);
+        else 
+            setEroare(EroareRFID::EroareSPI);
+
+        return false;
+
+    }
 
     return true;
 
@@ -240,7 +279,9 @@ uint8_t Cititor_RFID::citesteVersiune() {
         return 0;
     }
 
-    if(versiune != 0x91 && versiune != 0x92)
+    if(versiune != 0x91 && versiune != 0x92 && 
+       versiune != 0x82 && versiune != 0x90 &&
+       versiune != 0x88 && versiune != 0x89 && versiune != 0xB2)
     {
         setEroare(EroareRFID::InitializareEsuata);
     }
@@ -301,5 +342,47 @@ EroareRFID Cititor_RFID::handleEroare()
     }
 
     return ultimaEroare;
+
+}
+
+/*
+ - Verifica scrierea si citirea registrului 0x2D ca si test;
+ 
+ - Returneaza:
+ - 1 - Valorile scrise au fost citite corect.
+ - 0 - Testul a esuat.
+ */
+uint8_t Cititor_RFID::testComunicareSPI()
+{
+
+    const uint8_t registruTest = 0x2D;
+
+    uint8_t val_In = 0; // valoarea initiala
+    uint8_t val_Rd = 0; // valoarea citita
+
+    // Salvam continutul initial al registrului;
+    if(!citireRegistru(registruTest, val_In))
+        return 0;
+    
+    // Scriem 0x55 si verificam citirea;
+    bool succes = scriereRegistru(registruTest, 0x55) && citireRegistru(registruTest, val_Rd) && (val_Rd == 0x55);
+
+    // Daca prima verificare a reusit, testam 0xAA;
+    if (succes)
+    {
+        succes = scriereRegistru(registruTest, 0xAA) && citireRegistru(registruTest, val_Rd) &&  (val_Rd == 0xAA);
+    }
+
+    // Restauram valoarea initiala a registrului;
+    bool restaurat = scriereRegistru(registruTest, val_In);
+
+    if(!succes || !restaurat)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
 
 }
