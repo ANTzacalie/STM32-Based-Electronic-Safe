@@ -561,9 +561,9 @@ uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2])
     if(!raspunsPrimit)
     {
         if(irq & 0x02) 
-            EroareRFID::EroareCitire;
+           setEroare(EroareRFID::EroareCitire);
         else 
-            EroareRFID::CardAbsent;
+           setEroare(EroareRFID::CardAbsent);
         
         return 0;
     }
@@ -590,7 +590,7 @@ uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2])
     }
 
     // Citim cei doi octeti ATQA din FIFO;
-    if(!citesteRegistruTest(0x09, atqa[0]) || !citesteRegistruTest(0x09, atqa[1]))
+    if(!citireRegistru(0x09, atqa[0]) || !citireRegistru(0x09, atqa[1]))
     {
         return 0;
     }
