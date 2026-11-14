@@ -69,7 +69,6 @@ void MFRC522_RFID_INIT() {
         // breakpoint
         __NOP();
         
-
         HAL_Delay(200);
     }
     

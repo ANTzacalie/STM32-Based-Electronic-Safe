@@ -681,6 +681,7 @@ uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
     uint8_t lungime = 0;
     uint8_t control = 0;
 
+    // conform NXP datasheet
     if(!citireRegistru(0x06, erori) || !citireRegistru(0x0A, lungime) || !citireRegistru(0x0C, control))
     {
         return 0;
@@ -691,8 +692,11 @@ uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
        - Sa nu existe erori de protocol/coliziune.
        - Sa avem exact 5 octeti.
        - Ultimul octet sa contina 8 biti valizi.
+       0xDB verifica erorile BufferOvlf, ColErr, ParityErr, ProtocolErr, nu sunt 
+       verificat toate erorile, masca bitilor se gaseste la pagina 42;
     */
 
+    // conform NXP datasheet, 0x07 izoleaza exact ultimi trei biti din control, care ei trebuie sa fie zero;
     if((erori & 0x1B) != 0 || lungime != 5 || (control & 0x07) != 0)
     {
         setEroare(EroareRFID::EroareCitire);
@@ -702,7 +706,7 @@ uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
     // Citim cei 5 octeti din FIFO;
     for(uint8_t i = 0; i < 5; i++)
     {
-        if(!citireRegistru(0x09, uidCL1[i]));
+        if(!citireRegistru(0x09, uidCL1[i]))
             return 0;
     }
 
