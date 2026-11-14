@@ -31,6 +31,7 @@ enum class EroareRFID : uint8_t
  
   - Gestioneaza comunicarea cu modulul MFRC522
   si autentificarea cardurilor MIFARE Classic 1K.
+  #PROCEDURA DE IDENTIFICARE: REQA → ATQA → ANTICOLLISION → UID → SELECT;
 
   Ce trebuie sa faca in final:
   - Verifica daca un card este autorizat. 
@@ -83,6 +84,8 @@ class Cititor_RFID {
            -> 0 - Card absent sau eroare.
         */
         uint8_t detecteazaCard(uint8_t atqa[2]);
+
+        
 
     private:
 

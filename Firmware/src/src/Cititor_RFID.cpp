@@ -598,4 +598,5 @@ uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2])
     setEroare(EroareRFID::NicioEroare);
     return 1;
 
-}   
+}
+   

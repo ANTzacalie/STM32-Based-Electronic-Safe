@@ -15,13 +15,8 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
+void MFRC522_RFID_INIT() {
 
-int main(void)
-{
-    // Initializam infrastructura HAL.
-    HAL_Init();
-
-//////////////////////////////////// MFRC522_RFID ////////////////////////////////////
     // Initializare clasa cititor;
     Cititor_RFID cititor_mfrc522;
 
@@ -59,18 +54,24 @@ int main(void)
         volatile uint8_t atqa0 = atqa[0];
         volatile uint8_t atqa1 = atqa[1];
 
-        if(cardDetectat == 1)
-        {
-            // breakpoint
-            __NOP();
-        }
+        volatile EroareRFID err2 = cititor_mfrc522.getUltimaEroare();
+        // breakpoint
+        __NOP();
+        
 
         HAL_Delay(200);
     }
     
     // ############ TEST ############# //
-//////////////////////////////////// MFRC522_RFID ////////////////////////////////////
 
+}
+
+int main(void)
+{
+    // Initializam infrastructura HAL.
+    HAL_Init();
+
+    MFRC522_RFID_INIT();
 
 
     // Bucla principala.
