@@ -95,6 +95,18 @@ class Cititor_RFID {
         */
         uint8_t citesteUID_CL1(uint8_t uidCL1[5]);
 
+        /*
+          - Comanda SELECT pentru Cascade Level 1 contine 9 octeti transmisi catre card, 7 de comanda si 2 octeti CRC_A: 93 70 UID0 UID1 UID2 UID3 BCC CRC_L CRC_H
+          -> ultimi doi octeti sunt CRC_A folosit la verificarea integritati mesajului;
+
+          - Calculeaza CRC_A folosind coprocesorul MFRC522.
+            # date    - bufferul de date pentru calcul.
+            # lungime - numarul de octeti.
+            # crc     - buffer de 2 octeti: CRC_L, CRC_H.
+          - Returneaza true la succes, false la eroare.
+        */
+        bool calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t crc[2]);        
+
     private:
 
         // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;
@@ -127,7 +139,6 @@ class Cititor_RFID {
         bool scriereRegistru(uint8_t registru, uint8_t valoare);
 
     protected:
-
 
 };
 

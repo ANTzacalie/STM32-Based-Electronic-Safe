@@ -726,3 +726,97 @@ uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
     return 1;
 
 }
+
+
+/*
+  - Calculeaza CRC_A folosind hardware-ul MFRC522;
+   - ModeReg        = 0x11
+   - CommandReg     = 0x01
+   - DivIrqReg      = 0x05
+   - FIFODataReg    = 0x09
+   - FIFOLevelReg   = 0x0A
+   - CRCResultRegL  = 0x22
+   - CRCResultRegH  = 0x21
+ */
+bool Cititor_RFID::calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t crc[2])
+{
+
+    // Verificam argumentele si capacitatea FIFO;
+    if (date == nullptr || crc == nullptr || lungime == 0 || lungime > 64)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return false;
+    }
+
+    // Citim configuratia actuala a registrului ModeReg;
+    uint8_t mode = 0;
+
+    if (!citireRegistru(0x11, mode))
+        return false;
+
+    /*
+     - Bitii 1:0 = 01 selecteaza valoarea initiala;
+     - CRC = 0x6363, folosita pentru CRC_A;
+     - Pastram ceilalti biti nemodificatip
+    */
+    mode = (mode & 0xFC) | 0x01;
+
+    if (!scriereRegistru(0x11, mode) ||
+        !scriereRegistru(0x01, 0x00) || // Idle
+        !scriereRegistru(0x05, 0x04) || // Stergem CRCIRq
+        !scriereRegistru(0x0A, 0x80))   // Golim FIFO
+    {
+        return false;
+    }
+
+    // Introducem datele in FIFO-ul MFRC522;
+    for (uint8_t i = 0; i < lungime; i++)
+    {
+        if (!scriereRegistru(0x09, date[i]))
+            return false;
+    }
+
+    // Pornim coprocesorul CRC prin: CalcCRC = 0x03;
+    if (!scriereRegistru(0x01, 0x03))
+        return false;
+
+    uint8_t irq = 0;
+    bool calculTerminat = false;
+    uint32_t timpStart = HAL_GetTick();
+
+    // Asteptam maximum 30 ms finalizarea calculului;
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        if (!citireRegistru(0x05, irq))
+        {
+            scriereRegistru(0x01, 0x00);
+            return false;
+        }
+
+        // Bitul 2 (CRCIRq) indica finalizarea calculului;
+        if ((irq & 0x04) != 0)
+        {
+            calculTerminat = true;
+            break;
+        }
+    }
+
+    // Incheiem comanda CalcCRC;
+    if (!scriereRegistru(0x01, 0x00))
+        return false;
+
+    if (!calculTerminat)
+    {
+        setEroare(EroareRFID::Timeout);
+        return false;
+    }
+
+    // Citim rezultatul: mai intai LSB, apoi MSB;
+    if (!citireRegistru(0x22, crc[0]) || !citireRegistru(0x21, crc[1]))
+    {
+        return false;
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return true;
+}
