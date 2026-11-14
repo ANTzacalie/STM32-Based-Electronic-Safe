@@ -1,4 +1,5 @@
 #include <Cititor_RFID.h>
+#include "stm32f1xx_hal.h"
 #include <stdint.h>
 
 /*
@@ -14,11 +15,7 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
-
-int main(void)
-{
-    // Initializam infrastructura HAL.
-    HAL_Init();
+void MFRC522_RFID_INIT() {
 
 //////////////////////////////////// MFRC522_RFID ////////////////////////////////////
 
@@ -45,6 +42,15 @@ int main(void)
     
 
 //////////////////////////////////// MFRC522_RFID ////////////////////////////////////
+
+}
+
+int main(void)
+{
+    // Initializam infrastructura HAL.
+    HAL_Init();
+
+    MFRC522_RFID_INIT();
 
 
     // Bucla principala.
