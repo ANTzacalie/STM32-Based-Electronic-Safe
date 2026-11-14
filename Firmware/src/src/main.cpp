@@ -37,8 +37,10 @@ int main(void)
     // Inspectam valoarea de eroare la fiecare pas asa, mult mai usor;
     volatile EroareRFID err = cititor_mfrc522.getUltimaEroare();
 
+    // TX_CONTROL trebuie sa intoarca 131 in decimal, care inseamna 10000011 in binar, prin asta confirmam ca biti de activare a antenei MFRC522 sunt setati 1 si ca antena este pornita;
     volatile uint8_t txControl = cititor_mfrc522.citesteRegistruTest(0x14);
 
+    // intoarce true daca txControl este 131 in decimal;
     volatile bool antenaActivata = ((txControl & 0x03) == 0x03);
     
 
