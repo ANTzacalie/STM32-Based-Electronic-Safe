@@ -85,6 +85,16 @@ class Cititor_RFID {
         */
         uint8_t detecteazaCard(uint8_t atqa[2]);
 
+        /*
+         - Executa primul nivel de anticollision (CL1).
+         - uidCL1 - Buffer de 5 octeti, forma -> 4 octeti identificare + 1 octet BCC.
+        
+         -Returneaza:
+            -> 1 - Raspuns valid.
+            -> 0 - Eroare sau timeout.
+        */
+        uint8_t citesteUID_CL1(uint8_t uidCL1[5]);
+
     private:
 
         // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;

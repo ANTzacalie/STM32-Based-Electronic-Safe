@@ -75,7 +75,6 @@ int main(void)
 
     MFRC522_RFID_INIT();
 
-
     // Bucla principala.
     while (true)
     {

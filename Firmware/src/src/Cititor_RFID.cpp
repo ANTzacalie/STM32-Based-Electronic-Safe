@@ -600,3 +600,41 @@ uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2])
 
 }
    
+/*
+  - Citeste identificatorul cardului la Cascade Level 1.
+  - Se apeleaza dupa ce cardul a raspuns la REQA.
+ 
+  - *Momentan presupunem un singur card in campul RF.
+ */
+uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
+{
+
+    if(uidCL1 == nullptr)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Golim bufferul uidCL1 furnizat;
+    for(uint8_t i = 0; i < 5; i++)
+        uidCL1[i] = 0;
+
+    /*
+     Pregatim MFRC522 pentru anticollision:
+       - Oprim comenzile anterioare.
+       - Stergem intreruperile memorate.
+       - Golim FIFO.
+       - Trimitem SEL_CL1 si NVB.
+     */
+    if (!scriereRegistru(0x01, 0x00) ||  // Idle
+        !scriereRegistru(0x04, 0x7F) ||  // Sterge IRQ
+        !scriereRegistru(0x0A, 0x80) ||  // Goleste FIFO
+        !scriereRegistru(0x0E, 0x80) ||  // CollReg
+        !scriereRegistru(0x09, 0x93) ||  // SEL_CL1
+        !scriereRegistru(0x09, 0x20) ||  // NVB
+        !scriereRegistru(0x0D, 0x00) ||  // 8 biti, 1 octet
+        !scriereRegistru(0x01, 0x0C) ||  // Transceive
+        !scriereRegistru(0x0D, 0x80))    // StartSend
+    {
+
+}
