@@ -34,6 +34,14 @@ int main(void)
     // Executam testul SPI o singura data;
     volatile uint8_t rezultatSPI = cititor_mfrc522.testComunicareSPI(); 
 
+    // Inspectam valoarea de eroare la fiecare pas asa, mult mai usor;
+    volatile EroareRFID err = cititor_mfrc522.getUltimaEroare();
+
+    volatile uint8_t txControl = cititor_mfrc522.citesteRegistruTest(0x14);
+
+    volatile bool antenaActivata = ((txControl & 0x03) == 0x03);
+    
+
 //////////////////////////////////// MFRC522_RFID ////////////////////////////////////
 
 

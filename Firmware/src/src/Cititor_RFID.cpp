@@ -12,6 +12,12 @@ Cititor_RFID::Cititor_RFID()
     // configurare periferic SPI1
     initializareSPI();
 
+    // daca nu exista nicio eroare, putem continua la initializarea antenei;
+    if(getUltimaEroare() == EroareRFID:: NicioEroare)
+    {
+        activareAntena();
+    }
+
 }
 
 /*
@@ -221,6 +227,24 @@ bool Cititor_RFID::citireRegistru(uint8_t reg, uint8_t &val)
 
 }
 
+/*
+  - Citim un registru prin functia SPI
+  deja implementata in clasa.
+ */
+uint8_t Cititor_RFID::citesteRegistruTest(uint8_t adresa)
+{
+    uint8_t valoare = 0xFF;
+
+    // Citim registrul solicitat.
+    if (!citireRegistru(adresa, valoare))
+    {
+        // Transfer SPI esuat, folosim 0xFF ca identificator.
+        return 0xFF;
+    }
+
+    return valoare;
+}
+
 
 /*
     - Scrie o valoare intrun registru MFRC522,
@@ -384,5 +408,64 @@ uint8_t Cititor_RFID::testComunicareSPI()
 
     setEroare(EroareRFID::NicioEroare);
     return 1;
+
+}
+
+/*
+ - Conform datasheet NXP, pagina 50, registrul TxControlReg are adresa 0x14.
+ - Aici avem 2 biti:
+    b0 -> Tx1RFEn , activeaza driverul antenei TX1
+    b1 -> Tx2RFEn , activeaza driverul antenei TX2
+ - Pentru activarea antenei(completa), ambii biti trebuie sa fie 1, doar acesti biti din registru;
+*/
+
+bool Cititor_RFID::activareAntena() 
+{
+
+    const uint8_t registruTxControl = 0x14;
+    const uint8_t mascaActivareRF = 0x03;
+
+    uint8_t valoareRegistru = 0;
+
+    // Citim configuratia actuala a antenei;
+    if(!citireRegistru(registruTxControl, valoareRegistru))
+    {
+        return false;
+    }
+
+    // Verificam daca driverele sunt deja active;
+    if((valoareRegistru & mascaActivareRF) != mascaActivareRF)
+    {
+        // Setam biti b0 si b1 folosind operatia OR; ceilalti biti raman neschimbati;
+        /*
+            Inainte:   1000 0000   (0x80)
+            Masca:     0000 0011   (0x03)
+                       ---------
+            Rezultat:  1000 0011   (0x83)
+        */
+        valoareRegistru |= mascaActivareRF;
+        
+        // Scriem noua configuratie in MFRC522;
+        if(!scriereRegistru(registruTxControl, valoareRegistru))
+        {
+            return false;
+        }
+
+    }
+
+    // Recitim registrul pentru configurare;
+    if(!citireRegistru(registruTxControl, valoareRegistru))
+    {
+        return false;
+    }
+
+    // Verificam daca TX1 si TX2 sunt activate;
+    if((valoareRegistru & mascaActivareRF) != mascaActivareRF)
+    {
+        setEroare(EroareRFID::InitializareEsuata);
+        return false;
+    }
+
+    return true;
 
 }

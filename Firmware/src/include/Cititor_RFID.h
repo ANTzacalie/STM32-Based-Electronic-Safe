@@ -26,7 +26,6 @@ enum class EroareRFID : uint8_t
     OperatieNeimplementata // RFID: NU EXISTA OPERATIA.
 }; // OBS: HAL_OK nu inseamna ca transferul SPI a fost executat, nu garanteaza ca MFRC522 a raspuns corect, de aceea mereu verificam rezultatul cat putem de bine;
 
-
 /*
   - Clasa Cititor_RFID
  
@@ -72,8 +71,12 @@ class Cititor_RFID {
         // testeaza comunicatia SPI prin scriere si citire.
         uint8_t testComunicareSPI();
 
+        uint8_t citesteRegistruTest(uint8_t reg);
+
     private:
 
+        // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;
+        bool activareAntena();        
         /*
           - Citeste un registru intern al MFRC522 prin SPI
           Are doi paramatrii:
