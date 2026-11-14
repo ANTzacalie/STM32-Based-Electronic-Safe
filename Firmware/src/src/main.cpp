@@ -15,9 +15,13 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
-//////////////////////////////////// MFRC522_RFID ////////////////////////////////////
-void MFRC522_RFID_INIT() {
 
+int main(void)
+{
+    // Initializam infrastructura HAL.
+    HAL_Init();
+
+//////////////////////////////////// MFRC522_RFID ////////////////////////////////////
     // Initializare clasa cititor;
     Cititor_RFID cititor_mfrc522;
 
@@ -25,7 +29,6 @@ void MFRC522_RFID_INIT() {
     HAL_Delay(100);
     
     // ############ TEST ############# //
-
     // Citim registrul VersionReg al MFRC522, volatile type utilizat pentru a vedea in debugger;
     volatile uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune(); // 0x92 | 0x91 | 0x82 | 0x90 | 0x88 | 0x89 | 0xB2 | 0x12[CIP-FALS]
 
@@ -41,18 +44,33 @@ void MFRC522_RFID_INIT() {
     // intoarce true daca txControl este 131 in decimal;
     volatile bool antenaActivata = ((txControl & 0x03) == 0x03);
     
-    // ############ TEST ############# //
+    // bucla testare;
+    while (true)
+    {
+        // Verificam periodic prezenta unui card_rfid //
 
-}
+        // Buffer pentru raspunsul ATQA;
+        uint8_t atqa[2] = {0};
+
+        // 1 = raspuns valid, 0 = card absent/eroare;
+        volatile uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
+
+        // Salvam octetii separat pentru debugger;
+        volatile uint8_t atqa0 = atqa[0];
+        volatile uint8_t atqa1 = atqa[1];
+
+        if(cardDetectat == 1)
+        {
+            // breakpoint
+            __NOP();
+        }
+
+        HAL_Delay(200);
+    }
+    
+    // ############ TEST ############# //
 //////////////////////////////////// MFRC522_RFID ////////////////////////////////////
 
-
-int main(void)
-{
-    // Initializam infrastructura HAL.
-    HAL_Init();
-
-    MFRC522_RFID_INIT();
 
 
     // Bucla principala.
