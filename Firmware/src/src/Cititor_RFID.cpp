@@ -636,5 +636,89 @@ uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
         !scriereRegistru(0x01, 0x0C) ||  // Transceive
         !scriereRegistru(0x0D, 0x80))    // StartSend
     {
+        return 0;
+    }
+
+    // Asteptam raspunsul cardului;
+    // Folosim polling pe ComIrqReg, maxim 30ms;
+    uint8_t irq = 0;
+    uint32_t timpStart = HAL_GetTick();
+
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        if(!citireRegistru(0x04, irq))
+        {
+            // Oprim comanda in cazul erorri SPI;
+            scriereRegistru(0x0D, 0x00);
+            scriereRegistru(0x01, 0x00);
+            return 0;
+        }
+
+        // RxIRq, ErrIRq sau TimerIRq;
+        if(irq & 0x23)
+            break;
+    }
+    
+    // Oprim transmisia si revenim la Idle;
+    if(!scriereRegistru(0x0D, 0x00) || !scriereRegistru(0x01, 0x00))
+    {
+        return 0;
+    }
+
+    // Verificam daca am primit raspuns;
+    if((irq & 0x20) == 0)
+    {
+        if(irq & 0x02) 
+            setEroare(EroareRFID::EroareCitire);
+        else 
+            setEroare(EroareRFID::Timeout);
+
+        return 0;
+    }
+
+    // Citim registrele de stare ale raspunsului;
+    uint8_t erori   = 0;
+    uint8_t lungime = 0;
+    uint8_t control = 0;
+
+    if(!citireRegistru(0x06, erori) || !citireRegistru(0x0A, lungime) || !citireRegistru(0x0C, control))
+    {
+        return 0;
+    }
+
+    /*
+      Verificam:
+       - Sa nu existe erori de protocol/coliziune.
+       - Sa avem exact 5 octeti.
+       - Ultimul octet sa contina 8 biti valizi.
+    */
+
+    if((erori & 0x1B) != 0 || lungime != 5 || (control & 0x07) != 0)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Citim cei 5 octeti din FIFO;
+    for(uint8_t i = 0; i < 5; i++)
+    {
+        if(!citireRegistru(0x09, uidCL1[i]));
+            return 0;
+    }
+
+    /*
+      Verificam BCC;
+      Conform datasheet XOR intre primii 4 octeti trebuie sa fie egal cu al cincilea octet;
+    */
+    uint8_t bcc = uidCL1[0] ^ uidCL1[1] ^ uidCL1[2] ^ uidCL1[3]; // Operatia XOR(^);
+
+    if(bcc != uidCL1[4])
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
 
 }
