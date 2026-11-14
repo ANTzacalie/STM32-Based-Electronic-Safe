@@ -15,15 +15,17 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
-void MFRC522_RFID_INIT() {
-
 //////////////////////////////////// MFRC522_RFID ////////////////////////////////////
+void MFRC522_RFID_INIT() {
 
     // Initializare clasa cititor;
     Cititor_RFID cititor_mfrc522;
 
     // Asteptam stabilizarea cititorului RFID.
     HAL_Delay(100);
+
+    
+    // ############ TEST ############# //
 
     // Citim registrul VersionReg al MFRC522, volatile type utilizat pentru a vedea in debugger;
     volatile uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune(); // 0x92 | 0x91 | 0x82 | 0x90 | 0x88 | 0x89 | 0xB2 | 0x12[CIP-FALS]
@@ -40,10 +42,11 @@ void MFRC522_RFID_INIT() {
     // intoarce true daca txControl este 131 in decimal;
     volatile bool antenaActivata = ((txControl & 0x03) == 0x03);
     
-
-//////////////////////////////////// MFRC522_RFID ////////////////////////////////////
+    // ############ TEST ############# //
 
 }
+//////////////////////////////////// MFRC522_RFID ////////////////////////////////////
+
 
 int main(void)
 {
