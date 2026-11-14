@@ -3,7 +3,7 @@
 1. Vlad -> Keypadul {INPUT, AUTH, CONTROL}
 2. Alex -> Logica led, buzzer si Servo {AUTH(WARNING), CONTROL}
 3. Mario -> Display {AFISAJ, SETTINGS}
-4. Antonio -> RFID / Alimentare / General {AUTH, VDD, STORAGE, GENERAL}
+4. Antonio -> RFID / Alimentare / General {AUTH, VDD, STORAGE, GENERAL, DEBUG, CIRCUIT}
 
 * Conexiunile fizice ale componentelor la Microcontroller *
 
