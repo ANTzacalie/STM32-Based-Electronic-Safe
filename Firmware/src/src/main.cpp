@@ -77,11 +77,19 @@ void MFRC522_RFID_INIT() {
         // Calculam CRC_A prin coprocesorul MFRC522.
         volatile bool rezultatCRC = cititor_mfrc522.calculeazaCRC_A(dateSelect, 7, crc);
 
-        // Salvam separat valorile pentru debugger.
+        // Salvam separat valorile pentru debugger;
         volatile uint8_t crcLow = crc[0];
         volatile uint8_t crcHigh = crc[1];
 
+        // Testam SELECT numai daca ANTICOLLISION a reusit;
+        uint8_t sak = 0;
 
+        volatile uint8_t selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
+
+        // Salvam rezultatul pentru a vedea in debugger;
+        volatile uint8_t sakDebug = sak;
+
+        volatile EroareRFID eroareSelect = cititor_mfrc522.getUltimaEroare();
 
         // breakpoint
         __NOP();
