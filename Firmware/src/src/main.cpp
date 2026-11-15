@@ -54,8 +54,7 @@ void MFRC522_RFID_INIT() {
 
         // pas2. obtinem identificatorul CL1;
         volatile uint8_t uidCitit = 0;
-        if(cardDetectat == 1)
-            uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
+        if(cardDetectat == 1) uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
 
         // Citim rezultatele pentru debug;
         volatile uint8_t uid0 = uidCL1[0];
@@ -81,6 +80,8 @@ void MFRC522_RFID_INIT() {
         // Salvam separat valorile pentru debugger.
         volatile uint8_t crcLow = crc[0];
         volatile uint8_t crcHigh = crc[1];
+
+
 
         // breakpoint
         __NOP();

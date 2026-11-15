@@ -20,9 +20,9 @@ enum class EroareRFID : uint8_t
     CardAbsent,            // RFID: Nu exista card detectat.
     AutentificareEsuata,   // RFID: Autentificarea Crypto1 a esuat.
     CardNeautorizat,       // RFID: Cardul nu este cel inregistrat.
-    EroareCitire,          // RFID: Citirea cardului a esuat.
-    EroareScriere,         // RFID: Scrierea cardului a esuat.
-    EroareFlash,           // RFID: Eroare la salvarea in memoria MCU.
+    EroareCitire,          // RFID: Citirea cardului a esuat SAU citirea registrilor.
+    EroareScriere,         // RFID: Scrierea cardului a esuat SAU scrierea registrilor.
+    EroareFlash,           // RFID: Eroare la salvarea in memoria MCU SAU intoarcerea din.
     OperatieNeimplementata // RFID: NU EXISTA OPERATIA.
 }; // OBS: HAL_OK nu inseamna ca transferul SPI a fost executat, nu garanteaza ca MFRC522 a raspuns corect, de aceea mereu verificam rezultatul cat putem de bine;
 
@@ -105,7 +105,9 @@ class Cititor_RFID {
             # crc     - buffer de 2 octeti: CRC_L, CRC_H.
           - Returneaza true la succes, false la eroare.
         */
-        bool calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t crc[2]);        
+        bool calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t crc[2]);    
+        
+        uint8_t selecteazaCard_CL1(const uint8_t uidCL1[5], uint8_t &sak);
 
     private:
 

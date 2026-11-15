@@ -582,8 +582,9 @@ uint8_t Cititor_RFID::detecteazaCard(uint8_t atqa[2])
      - ATQA trebuie sa aiba exact 16 biti:
        -> 2 octeti in FIFO
        -> 0 biti suplimentari in ultimul octet.
+     - 0xDF verifica toate erorile in afara de reserved;
     */
-    if((erori & 0x1B) != 0 || nrOcteti != 2 || (control & 0x07) != 0)
+    if((erori & 0xDF) != 0 || nrOcteti != 2 || (control & 0x07) != 0)
     {
         setEroare(EroareRFID::EroareCitire);
         return 0;
@@ -692,12 +693,12 @@ uint8_t Cititor_RFID::citesteUID_CL1(uint8_t uidCL1[5])
        - Sa nu existe erori de protocol/coliziune.
        - Sa avem exact 5 octeti.
        - Ultimul octet sa contina 8 biti valizi.
-       0xDB verifica erorile BufferOvlf, ColErr, ParityErr, ProtocolErr, nu sunt 
-       verificat toate erorile, masca bitilor se gaseste la pagina 42;
+       0xDF verifica toate erorile BufferOvlf, ColErr, ParityErr, ProtocolErr, nu este 
+       verificat reserved, masca bitilor se gaseste la pagina 42;
     */
 
     // conform NXP datasheet, 0x07 izoleaza exact ultimi trei biti din control, care ei trebuie sa fie zero;
-    if((erori & 0x1B) != 0 || lungime != 5 || (control & 0x07) != 0)
+    if((erori & 0xDF) != 0 || lungime != 5 || (control & 0x07) != 0)
     {
         setEroare(EroareRFID::EroareCitire);
         return 0;
@@ -819,4 +820,135 @@ bool Cititor_RFID::calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t
 
     setEroare(EroareRFID::NicioEroare);
     return true;
+}
+
+/*
+
+ - Comanda SELECT transmite 0x93, 0x70, cei 5 octeți UID CL1 + BCC și cei 2 octeți CRC_A.
+ - Cardul răspunde cu 3 octeți: SAK + CRC_L + CRC_H.
+ - Pentru un MIFARE Classic 1K cu UID complet după CL1, ne așteptăm la SAK = 0x08, conform datasheet-ului NXP.
+
+*/
+uint8_t Cititor_RFID::selecteazaCard_CL1(const uint8_t uidCL1[5], uint8_t &sak)
+{
+
+    sak = 0;
+    if(uidCL1 == nullptr)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Pregatim comanda SELECT CL1: 93 70 UID0 UID1 UID2 UID3 BCC.
+    uint8_t comanda[9] = {0x93, 0x70};
+
+    for (uint8_t i = 0; i < 5; i++)
+    {
+        comanda[i+2] = uidCL1[i]; // completeaza de la bitul 3 in colo etc..;
+    }
+    
+    // Calculam CRC_A pentru primii 7 octeti;
+    if(!calculeazaCRC_A(comanda, 7, &comanda[7]))
+        return 0;
+    
+    // Oprim comanda precedenta si pregatim FIFO;
+    if(!scriereRegistru(0x01, 0x00) ||  // Idle
+       !scriereRegistru(0x04, 0x7F) ||  // Stergem IRQ
+       !scriereRegistru(0x0A, 0x80) ||  // Golim FIFO
+       !scriereRegistru(0x0D, 0x00))    // Transmisie pe octeti intregi;
+    {
+        return 0;
+    }
+
+    // Introducem toti cei 9 octeti in FIFO;
+    for(uint8_t i = 0; i < 9; i++)
+    {
+        if(!scriereRegistru(0x09, comanda[i]))
+        {
+            return 0;
+        }
+    }
+
+    // Pornim transmisia si receptia;
+    if(!scriereRegistru(0x01, 0x0C) || !scriereRegistru(0x0D, 0x80)) // in ordine Transceive, StartSend(1)
+    {
+        return 0;
+    }
+
+    uint8_t irq = 0;
+    uint32_t timpStart = HAL_GetTick();
+
+    // Asteptam raspunsul cardului, maxim 30 ms;
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        if(!citireRegistru(0x04, irq))
+            return 0;
+        
+        // RxIRq, ErrIRq sau TimerIRq;
+        if((irq & 0x23) != 0)
+            break;
+    }
+
+    // Citim starea inainte de a termina comanda;
+    uint8_t erori   = 0;
+    uint8_t lungime = 0;
+    uint8_t control = 0;
+    
+    if(!citireRegistru(0x06, erori) || !citireRegistru(0x0A, lungime), !citireRegistru(0x0C, control))
+    {
+        return 0;
+    }
+
+    // Oprim StartSend si comanda Transceive;
+    if (!scriereRegistru(0x0D, 0x00) || !scriereRegistru(0x01, 0x00))
+    {
+        return 0;
+    }
+
+    // Verificam daca am primit un raspuns.
+    if ((irq & 0x20) == 0)
+    {
+        setEroare(EroareRFID::Timeout);
+        return 0;
+    }
+
+    /*
+      - 0xDF verifica toate erorile definite din ErrorReg, fara bitul reserved.
+      - SAK trebuie sa contina exact 3 octeti: SAK + CRC_L + CRC_H.
+     */
+    if ((erori & 0xDF) != 0 || lungime != 3 || (control & 0x07) != 0)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Citim cei 3 octeti primiti;
+    uint8_t raspuns[3] = {0};
+
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        if(!citireRegistru(0x09, raspuns[i]))
+        {
+            return 0;
+        }
+    }
+    
+    // Verificam CRC_A al octetului SAK;
+    uint8_t crcCalculat[2] = {0};
+
+    if(!calculeazaCRC_A(raspuns, 1, crcCalculat))
+        return 0;
+    
+    if(crcCalculat[0] != raspuns[1] || crcCalculat[1] != raspuns[2])
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Raspunsul SELECT este valid;
+    sak = raspuns[0];
+
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
+
 }
