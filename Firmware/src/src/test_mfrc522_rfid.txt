@@ -1,0 +1,70 @@
+/// TESTE MFRC522 PENTRU CARTELA/TAG MIFARE 1k //
+
+/*
+    // Citim registrul VersionReg al MFRC522, volatile type utilizat pentru a vedea in debugger;
+    volatile uint8_t versiuneRFID = cititor_mfrc522.citesteVersiune(); // 0x92 | 0x91 | 0x82 | 0x90 | 0x88 | 0x89 | 0xB2 | 0x12[CIP-FALS]
+
+    // Executam testul SPI o singura data;
+    volatile uint8_t rezultatSPI = cititor_mfrc522.testComunicareSPI(); 
+
+    // Inspectam valoarea de eroare la fiecare pas asa, mult mai usor;
+    volatile EroareRFID err = cititor_mfrc522.getUltimaEroare();
+
+    // TX_CONTROL trebuie sa intoarca 131 in decimal, care inseamna 10000011 in binar, prin asta confirmam ca biti de activare a antenei MFRC522 sunt setati 1 si ca antena este pornita;
+    volatile uint8_t txControl = cititor_mfrc522.citesteRegistruTest(0x14);
+
+    // intoarce true daca txControl este 131 in decimal;
+    volatile bool antenaActivata = ((txControl & 0x03) == 0x03);
+    
+    // bucla testare;
+    while (true)
+    {
+        // Verificam periodic prezenta unui card_rfid //
+
+        // Buffer pentru raspunsurile RFID;
+        uint8_t atqa[2] = {0};
+        uint8_t uidCL1[5] = {0};
+
+        // pas1. detectam cardul prin REQA 1 = raspuns valid, 0 = card absent/eroare;
+        volatile uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
+
+        // pas2. obtinem identificatorul CL1;
+        volatile uint8_t uidCitit = 0;
+        if(cardDetectat == 1) uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
+
+        // Citim rezultatele pentru debug;
+        volatile uint8_t uid0 = uidCL1[0];
+        volatile uint8_t uid1 = uidCL1[1];
+        volatile uint8_t uid2 = uidCL1[2];
+        volatile uint8_t uid3 = uidCL1[3];
+        volatile uint8_t uid4 = uidCL1[4];
+        
+        // verificam ultima eroare;
+        volatile EroareRFID err2 = cititor_mfrc522.getUltimaEroare();
+
+        uint8_t dateSelect[7] = {
+            0x93, 0x70,
+            0x55, 0x88, 0xF0, 0x06, 0x2B
+        };
+
+        // Buffer pentru cei doi octeti CRC.
+        uint8_t crc[2] = {0};
+
+        // Calculam CRC_A prin coprocesorul MFRC522.
+        volatile bool rezultatCRC = cititor_mfrc522.calculeazaCRC_A(dateSelect, 7, crc);
+
+        // Salvam separat valorile pentru debugger;
+        volatile uint8_t crcLow = crc[0];
+        volatile uint8_t crcHigh = crc[1];
+
+        // Testam SELECT numai daca ANTICOLLISION a reusit;
+        uint8_t sak = 0;
+
+        volatile uint8_t selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
+
+        // Salvam rezultatul pentru a vedea in debugger;
+        volatile uint8_t sakDebug = sak;
+
+        volatile EroareRFID eroareSelect = cititor_mfrc522.getUltimaEroare();
+    }
+*/
