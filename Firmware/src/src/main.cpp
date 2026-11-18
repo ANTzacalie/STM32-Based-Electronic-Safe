@@ -1,6 +1,5 @@
 #include <Cititor_RFID.h>
 #include "stm32f1xx_hal.h"
-#include <stdint.h>
 
 /*
  - Handler pentru intreruperea SysTick.
@@ -27,6 +26,8 @@ void MFRC522_RFID_INIT() {
     // ############ TEST ############# //
     while (true)
     {
+
+        
 
         // breakpoint
         __NOP();

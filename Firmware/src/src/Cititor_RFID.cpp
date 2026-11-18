@@ -952,3 +952,91 @@ uint8_t Cititor_RFID::selecteazaCard_CL1(const uint8_t uidCL1[5], uint8_t &sak)
     return 1;
 
 }
+
+/* Conform datasheet-ului NXP, comanda MFAuthent = 0x0E primește în FIFO exact 12 octeți:
+// [0x60] [0x04] [FF FF FF FF FF FF] [55 88 F0 06]
+//   │      │          │                │
+// Key A   Bloc     Cheia A          UID (4 octeti)
+
+
+0x60 înseamnă autentificare cu Key A, iar 0x61 cu Key B conform datasheet;
+Cheia [EXEMPLU] FF FF FF FF FF FF este cheia implicită întâlnită pe multe carduri MIFARE Classic nepersonalizate. 
+Nu este garantat că toate cardurile goale o folosesc.
+*/
+
+uint8_t Cititor_RFID::autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], const uint8_t uid[4])
+{
+    if (cheie == nullptr || uid == nullptr)
+    {
+        setEroare(EroareRFID::AutentificareEsuata);
+        return 0;
+    }
+
+    // 12 octeti necesari pentru MFAuthent;
+    uint8_t date[12] = {0x60, bloc};
+
+    // Copiem cheia de 6 octeti.
+    for (uint8_t i = 0; i < 6; i++)
+        date[i + 2] = cheie[i];
+
+    // Copiem cei 4 octeti UID.
+    for (uint8_t i = 0; i < 4; i++)
+        date[i + 8] = uid[i];
+
+    // Pregatim MFRC522 pentru autentificare;
+    if (!scriereRegistru(0x01, 0x00) ||  // Idle
+        !scriereRegistru(0x04, 0x7F) ||  // Sterge IRQ
+        !scriereRegistru(0x0A, 0x80))    // Golim FIFO
+        return 0;
+
+    // Scriem in FIFO cei 12 octeti.
+    for (uint8_t i = 0; i < 12; i++)
+    {
+        if (!scriereRegistru(0x09, date[i]))
+            return 0;
+    }
+
+    // Pornim autentificarea hardware Crypto1;
+    if (!scriereRegistru(0x01, 0x0E))
+        return 0;
+
+    uint8_t irq = 0;
+    uint32_t timpStart = HAL_GetTick();
+
+    // Asteptam finalizarea autentificarii;
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        if (!citireRegistru(0x04, irq))
+        {
+            scriereRegistru(0x01, 0x00);
+            return 0;
+        }
+
+        // IdleIRq, ErrIRq sau TimerIRq;
+        if ((irq & 0x13) != 0)
+            break;
+    }
+
+    // Oprim comanda daca nu s-a terminat deja;
+    if (!scriereRegistru(0x01, 0x00))
+        return 0;
+
+    uint8_t status2 = 0;
+    uint8_t erori = 0;
+
+    if (!citireRegistru(0x08, status2) || !citireRegistru(0x06, erori))
+        return 0;
+
+    /*
+     - Bitul 3 din Status2Reg este MFCrypto1 On;
+     - Acesta devine 1 dupa autentificarea reusita;
+    */
+    if ((status2 & 0x08) == 0 || (erori & 0xDF) != 0)
+    {
+        setEroare(EroareRFID::AutentificareEsuata);
+        return 0;
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
+}

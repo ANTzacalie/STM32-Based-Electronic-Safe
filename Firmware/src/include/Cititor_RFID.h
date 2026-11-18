@@ -109,6 +109,9 @@ class Cititor_RFID {
         
         uint8_t selecteazaCard_CL1(const uint8_t uidCL1[5], uint8_t &sak);
 
+        // Autentifica accesul la un block folosind Key A;
+        uint8_t autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], const uint8_t uid[4]);
+
     private:
 
         // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;
