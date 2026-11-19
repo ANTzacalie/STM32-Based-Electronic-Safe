@@ -1083,3 +1083,4 @@ bool Cititor_RFID::resetareSesiuneRFID()
 
     return true;
 }
+
