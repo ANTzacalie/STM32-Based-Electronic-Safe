@@ -17,8 +17,9 @@ class Display
         void setEnglish(bool enabled); //selectare numai texte englezesti/romanesti; nu navigheaza si nu salveaza alegerea in Flash
         bool setBrightness(unint8_t level); //primeste 0=minim, 1=mediu, 2=maxim. apelantul decide cand si de ce schimba nivelul
 
+        void clear(); //sterge numai memoria de pixeli din RAM; 
+        void drawPixel(int x, int y, bool on = true); //aprinde/stinge un pixel valid din buffer; implicit on=true
         
-
 
 
 
