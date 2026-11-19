@@ -77,10 +77,12 @@ void MFRC522_RFID_INIT() {
             );
         }
 
-        volatile EroareRFID eroareAutentificare =
-        cititor_mfrc522.getUltimaEroare();
+        volatile EroareRFID eroareAutentificare = cititor_mfrc522.getUltimaEroare();
         // breakpoint
         __NOP();
+
+        // Reset sesiune MFRC522;
+        volatile bool sesiuneResetata = cititor_mfrc522.resetareSesiuneRFID();
         
         HAL_Delay(200);
         

@@ -112,6 +112,12 @@ class Cititor_RFID {
         // Autentifica accesul la un block folosind Key A;
         uint8_t autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], const uint8_t uid[4]);
 
+        /*
+          - Inchide sesiunea Crypto1 si reseteaza
+          starea cardului prin intreruperea campului RF.
+        */
+        bool resetareSesiuneRFID();
+
     private:
 
         // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;

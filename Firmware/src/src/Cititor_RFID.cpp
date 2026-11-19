@@ -1040,3 +1040,46 @@ uint8_t Cititor_RFID::autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], 
     setEroare(EroareRFID::NicioEroare);
     return 1;
 }
+
+bool Cititor_RFID::resetareSesiuneRFID()
+{
+
+    uint8_t status2 = 0;
+    uint8_t txControl = 0;
+
+    // Oprim orice comanda activa;
+    if (!scriereRegistru(0x01, 0x00))
+        return false;
+
+    // Citim Status2Reg;
+    if (!citireRegistru(0x08, status2))
+        return false;
+
+    // Dezactivam Crypto1 prin stergerea bitului 3;
+    status2 &= 0xF7;
+
+    if (!scriereRegistru(0x08, status2))
+        return false;
+
+    // Citim registrul de control al antenei;
+    if (!citireRegistru(0x14, txControl))
+        return false;
+
+    // Dezactivam TX1 si TX2, stergand bitii 0 si 1;
+    txControl &= 0xFC;
+
+    if (!scriereRegistru(0x14, txControl))
+        return false;
+
+    // Permitem descarcarea si resetarea cardului.
+    HAL_Delay(50);
+
+    // Reactivam antena folosind metoda existenta;
+    if (!activareAntena())
+        return false;
+
+    // Asteptam stabilizarea campului RF;
+    HAL_Delay(50);
+
+    return true;
+}
