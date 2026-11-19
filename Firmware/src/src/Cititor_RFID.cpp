@@ -1041,6 +1041,11 @@ uint8_t Cititor_RFID::autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], 
     return 1;
 }
 
+/*
+
+    ***PENTRU TESTE, metoda finala va avea oprireCrypto1 -> dezactivareAntena -> [locked]activareAntena
+
+*/
 bool Cititor_RFID::resetareSesiuneRFID()
 {
 

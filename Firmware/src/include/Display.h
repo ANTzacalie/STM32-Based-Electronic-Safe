@@ -15,7 +15,7 @@ class Display
         bool isReady() const; //returnare initializarea/ultimul transfer a reusit, fara o verificare electronica
         const char* getLastError() const; //returnarea unui text scurt pentru debugger sau log. un OLED defect nu poate avertiza singur
         void setEnglish(bool enabled); //selectare numai texte englezesti/romanesti; nu navigheaza si nu salveaza alegerea in Flash
-        bool setBrightness(unint8_t level); //primeste 0=minim, 1=mediu, 2=maxim. apelantul decide cand si de ce schimba nivelul
+        bool setBrightness(uint8_t level); //primeste 0=minim, 1=mediu, 2=maxim. apelantul decide cand si de ce schimba nivelul
 
         void clear(); //sterge numai memoria de pixeli din RAM; 
         void drawPixel(int x, int y, bool on = true); //aprinde/stinge un pixel valid din buffer; implicit on=true
@@ -24,6 +24,6 @@ class Display
 
 
     private:
-}
+};
 
 #endif

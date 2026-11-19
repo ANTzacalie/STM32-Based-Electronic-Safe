@@ -8,9 +8,9 @@
 enum class EroareSeif : uint8_t
 {
 
-    
 
-}
+
+};
 
 
 class Safe {
