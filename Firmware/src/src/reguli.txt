@@ -18,7 +18,8 @@
     11. Se lucreaza in genral pe HAL si mai putin pe registre!;
 
 *** // STAGI DE EXECUTARE PROIECT // ***
-
-// de adaugat......
-
+/*
+   1. Toate clasele trebuie sa aiba #include<Safe.h>;
+   2. 
+/*
 *** // STAGI DE EXECUTARE PROIECT // ***
