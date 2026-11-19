@@ -9,9 +9,13 @@
 
 class Display  
 {
-    public:
+    public: // apelare din main sau clasele celorlalti colegi
+        Display(); //constructor
+        bool begin(); // configurare PB6/PB7 si I2C prin HAL, detectare OLED si trimitere initilizare in SSD1306
+        bool isReady() const; //returnare initializarea/ultimul transfer a reusit, fara o verificare electronica
 
 
-    
+
+
     private:
 }
