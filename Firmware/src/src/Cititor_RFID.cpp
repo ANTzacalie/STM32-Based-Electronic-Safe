@@ -1089,3 +1089,146 @@ bool Cititor_RFID::resetareSesiuneRFID()
     return true;
 }
 
+
+uint8_t Cititor_RFID::citesteBloc(uint8_t bloc, uint8_t date[16])
+{
+    // Verificam argumentele pentru MIFARE Classic 1K;
+    if (date == nullptr || bloc > 63)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Verificam daca sesiunea Crypto1 este activa;
+    uint8_t status2 = 0;
+
+    if (!citireRegistru(0x08, status2))
+        return 0;
+
+    if ((status2 & 0x08) == 0)
+    {
+        setEroare(EroareRFID::AutentificareEsuata);
+        return 0;
+    }
+
+    // Construim comanda READ: 0x30 + bloc + CRC_A;
+    uint8_t comanda[4] = {0x30, bloc, 0, 0};
+
+    // Calculam CRC_A pentru primii doi octeti;
+    if (!calculeazaCRC_A(comanda, 2, &comanda[2]))
+        return 0;
+
+    // Pregatim registrele MFRC522 pentru transmisie;
+    if (!scriereRegistru(0x01, 0x00) || // Idle
+        !scriereRegistru(0x04, 0x7F) || // Sterge IRQ
+        !scriereRegistru(0x0A, 0x80) || // Golim FIFO
+        !scriereRegistru(0x0D, 0x00))   // Octeti intregi
+    {
+        return 0;
+    }
+
+    // Introducem comanda READ in FIFO;
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        if (!scriereRegistru(0x09, comanda[i]))
+        {
+            return 0;
+        }
+    }
+
+    // Pornim transmisia catre card;
+    if (!scriereRegistru(0x01, 0x0C) || // Transceive
+        !scriereRegistru(0x0D, 0x80))   // StartSend
+    {
+        return 0;
+    }
+
+    // Asteptam raspunsul cardului, maximum 30 ms;
+    uint8_t irq = 0;
+    uint32_t timpStart = HAL_GetTick();
+
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        if (!citireRegistru(0x04, irq))
+            return 0;
+
+        // RxIRq, ErrIRq sau TimerIRq.
+        if ((irq & 0x23) != 0)
+            break;
+    }
+
+    // Citim informatiile despre raspuns;
+    uint8_t erori = 0;
+    uint8_t lungime = 0;
+    uint8_t control = 0;
+
+    if (!citireRegistru(0x06, erori)   ||
+        !citireRegistru(0x0A, lungime) ||
+        !citireRegistru(0x0C, control))
+    {
+        return 0;
+    }
+
+    // Incheiem comanda Transceive;
+    if (!scriereRegistru(0x0D, 0x00) || !scriereRegistru(0x01, 0x00))
+    {
+        return 0;
+    }
+
+    // Verificam eventualele erori ale cititorului;
+    if ((erori & 0xDF) != 0)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Verificam daca am primit raspuns;
+    if ((irq & 0x20) == 0)
+    {
+        setEroare(EroareRFID::Timeout);
+        return 0;
+    }
+
+    /*
+     - Raspunsul trebuie sa contina 18 octeti:
+      16 octeti de date + 2 octeti CRC_A;
+    */
+    if (lungime != 18 || (control & 0x07) != 0)
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Citim raspunsul complet din FIFO;
+    uint8_t raspuns[18] = {0};
+
+    for (uint8_t i = 0; i < 18; i++)
+    {
+        if (!citireRegistru(0x09, raspuns[i]))
+        {
+            return 0;
+        }
+    }
+
+    // Calculam CRC_A pentru cei 16 octeti primiti;
+    uint8_t crcCalculat[2] = {0};
+
+    if (!calculeazaCRC_A(raspuns, 16, crcCalculat))
+        return 0;
+
+    // Comparam CRC-ul calculat cu cel primit;
+    if (crcCalculat[0] != raspuns[16] || crcCalculat[1] != raspuns[17])
+    {
+        setEroare(EroareRFID::EroareCitire);
+        return 0;
+    }
+
+    // Copiem datele numai dupa validarea raspunsului;
+    for (uint8_t i = 0; i < 16; i++)
+    {
+        date[i] = raspuns[i];
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
+}

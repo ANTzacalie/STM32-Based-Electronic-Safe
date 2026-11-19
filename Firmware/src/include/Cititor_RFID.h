@@ -113,10 +113,20 @@ class Cititor_RFID {
         uint8_t autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], const uint8_t uid[4]);
 
         /*
-          - Inchide sesiunea Crypto1 si reseteaza
+          - Inchide sesiunea Crypto1 si reseteaza *** TEST
           starea cardului prin intreruperea campului RF.
         */
         bool resetareSesiuneRFID();
+
+        /*
+          - Citeste cei 16 octeti ai unui bloc MIFARE Classic;
+          - Necesita autentificarea prealabila a sectorului;
+ 
+          - Returneaza:
+            # 1 - Citire reusita si CRC valid;
+            # 0 - Eroare;
+      */
+      uint8_t citesteBloc(uint8_t bloc, uint8_t date[16]);
 
     private:
 

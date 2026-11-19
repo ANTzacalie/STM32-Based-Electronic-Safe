@@ -63,7 +63,7 @@ void MFRC522_RFID_INIT() {
 
         volatile EroareRFID eroareSelect = cititor_mfrc522.getUltimaEroare();
 
-        // Cheia implicita MIFARE Classic.
+        // Cheia implicita MIFARE Classic;;
         uint8_t keyA[6] = {
             0xFF, 0xFF, 0xFF,
             0xFF, 0xFF, 0xFF
@@ -73,10 +73,22 @@ void MFRC522_RFID_INIT() {
 
         if (selectat == 1)
         {
-            // Autentificam blocul 4 din sectorul 1.
+            // Autentificam blocul 4 din sectorul 1;
             autentificat = cititor_mfrc522.autentificaBlocKeyA(
                 4, keyA, uidCL1
             );
+        }
+
+        // Buffer pentru continutul blocului 4.
+        uint8_t dateBloc[16] = {0};
+
+        // Retinem rezultatul operatiei READ;
+        volatile uint8_t blocCitit = 0;
+
+        // Citim blocul numai dupa autentificarea reusita;
+        if (autentificat == 1)
+        {
+            blocCitit = cititor_mfrc522.citesteBloc(4, dateBloc);
         }
 
         volatile EroareRFID eroareAutentificare = cititor_mfrc522.getUltimaEroare();
