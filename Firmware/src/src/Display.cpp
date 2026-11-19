@@ -1,3 +1,5 @@
+
+// Mario, include path la Display.h , il tot stergi, cum vede clasa unde implementezi metodele?
 #include "Display.h"
 #include <string.h>
 
