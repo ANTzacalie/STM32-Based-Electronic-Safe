@@ -1,6 +1,8 @@
 #include <Cititor_RFID.h>
-#include "stm32f1xx_hal.h"
+#include <Safe.h>
+#include <Display.h>
 
+#include "stm32f1xx_hal.h"
 /*
  - Handler pentru intreruperea SysTick.
  - HAL_IncTick() incrementeaza contorul HAL
