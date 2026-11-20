@@ -17,7 +17,7 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
     ComenziInvalide            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
 
-}
+};
 
 
 class Display  
@@ -37,6 +37,6 @@ class Display
 
 
     private:
-}
+};
 
 #endif
