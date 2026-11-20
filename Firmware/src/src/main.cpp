@@ -33,9 +33,9 @@ void MFRC522_RFID_INIT() {
         uint8_t uidCL1[5] = {0};
 
         // pas1. detectam cardul prin REQA 1 = raspuns valid, 0 = card absent/eroare;
-        volatile uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
+        uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
 
-        volatile uint8_t uidCitit = 0;
+        uint8_t uidCitit = 0;
         if(cardDetectat == 1) uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
 
         uint8_t dateSelect[7] = {
@@ -46,22 +46,10 @@ void MFRC522_RFID_INIT() {
         // Buffer pentru cei doi octeti CRC.
         uint8_t crc[2] = {0};
 
-        // Calculam CRC_A prin coprocesorul MFRC522.
-        volatile bool rezultatCRC = cititor_mfrc522.calculeazaCRC_A(dateSelect, 7, crc);
-
-        // Salvam separat valorile pentru debugger;
-        volatile uint8_t crcLow = crc[0];
-        volatile uint8_t crcHigh = crc[1];
-
         // Testam SELECT numai daca ANTICOLLISION a reusit;
         uint8_t sak = 0;
 
-        volatile uint8_t selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
-
-        // Salvam rezultatul pentru a vedea in debugger;
-        volatile uint8_t sakDebug = sak;
-
-        volatile EroareRFID eroareSelect = cititor_mfrc522.getUltimaEroare();
+        uint8_t selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
 
         // Cheia implicita MIFARE Classic;;
         uint8_t keyA[6] = {
@@ -82,7 +70,7 @@ void MFRC522_RFID_INIT() {
         // Buffer pentru continutul blocului 4.
         uint8_t dateBloc[16] = {0};
 
-        // Retinem rezultatul operatiei READ;
+        // Retinem rezultatul operatiei READ, SECTORUL 0 de pe card, din cele 16;
         volatile uint8_t blocCitit = 0;
 
         // Citim blocul numai dupa autentificarea reusita;
@@ -92,6 +80,7 @@ void MFRC522_RFID_INIT() {
         }
 
         volatile EroareRFID eroareAutentificare = cititor_mfrc522.getUltimaEroare();
+        
         // breakpoint
         __NOP();
 

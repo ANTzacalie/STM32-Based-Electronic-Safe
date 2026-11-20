@@ -121,6 +121,7 @@ class Cititor_RFID {
         /*
           - Citeste cei 16 octeti ai unui bloc MIFARE Classic;
           - Necesita autentificarea prealabila a sectorului;
+          - MIFARE 1K are 16 sectoare a cate 64 biti fiecare;
  
           - Returneaza:
             # 1 - Citire reusita si CRC valid;
