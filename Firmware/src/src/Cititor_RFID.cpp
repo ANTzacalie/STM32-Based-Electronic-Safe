@@ -1,5 +1,5 @@
 
-#include "../include/Cititor_RFID.h"
+#include <Cititor_RFID.h>
 
 
 // Se executa utomat la creearea unui obiect de tip Cititor_RFID
@@ -1335,6 +1335,12 @@ bool Cititor_RFID::transmite_cu_ACK(const uint8_t *date, uint8_t lungime)
         return false;
     }
 
+    /* ACK:       xxxx 1010
+       Masca:     0000 1111
+                  ---------
+       Rezultat:  0000 1010 = 0x0A
+     - Conform datasheet-ului MIFARE Classic, secțiunea 9.3, valoarea 0x0A reprezintă confirmarea pozitivă ACK;
+    */
     // Verificam cei 4 biti semnificativi ai raspunsului;
     if ((ack & 0x0F) != 0x0A)
     {
@@ -1349,11 +1355,18 @@ bool Cititor_RFID::transmite_cu_ACK(const uint8_t *date, uint8_t lungime)
 
 /*  
 
-  - Spre deosebire de citire, scrierea se realizează în două 
-  etape, conform datasheet-ului NXP, secțiunea 12.3, pagina 22. 
+  - Spre deosebire de citire, scrierea se realizează în două etape, conform datasheet-ului NXP, secțiunea 12.3, pagina 22. 
+  - Scriem un bloc de date MIFARE Classic 1K folosind procedura WRITE in doua etape.
 
 */
-uint8_t Cititor_RFID::scrieBloc()
+uint8_t Cititor_RFID::scrieBloc(uint8_t bloc, const uint8_t data[16])
 {
+
+    /*
+       - Verificam argumentele;
+       - Protejam temporar MANUFACTURER BLOACK (0) si toate blcurile SECTOR TRAILER;
+    */
+
+    
 
 }
