@@ -7,6 +7,19 @@
 
 //Trebuie grupata initializarea, memoria de pixeli, comunicatia si machetele OLED intr-o singura clasa 
 
+enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
+{
+    NicioEroare = 0,            //Operatia care actualizeaza ultima eroare a reusit; zero reprezinta lipsa erorilor
+    Neinitializat,              //Obiectul Display a fost creat, dar initialiazarea prin begin() nu a avut loc inca
+    InitializareI2CEsuata,      //HAL_I2C nu a reusit sa configureze I2C pentru comunicarea cu display-ul
+                                //Verificare configurare I2C1 si a pinilor PB6/PB7, acest cod nu spune singur cauza exacta
+    DisplayFaraRaspuns,         //Nu s-a primit raspuns de la OLED
+                                //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
+    ComenziInvalide            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
+
+}
+
+
 class Display  
 {
     public: // apelare din main sau clasele celorlalti colegi
@@ -24,6 +37,6 @@ class Display
 
 
     private:
-};
+}
 
 #endif
