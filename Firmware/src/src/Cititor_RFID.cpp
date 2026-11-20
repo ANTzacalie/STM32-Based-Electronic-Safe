@@ -1233,3 +1233,127 @@ uint8_t Cititor_RFID::citesteBloc(uint8_t bloc, uint8_t date[16])
     return 1;
 }
 
+
+/*
+ - Transmite date prin MFRC522 si asteapta
+ confirmarea ACK specifica MIFARE Classic.
+ 
+ - Bufferul primit trebuie sa contina deja CRC_A.
+*/
+bool Cititor_RFID::transmite_cu_ACK(const uint8_t *date, uint8_t lungime)
+{
+    // Pregatim registrele pentru transmisie;
+    if (!scriereRegistru(0x01, 0x00) || // Idle
+        !scriereRegistru(0x04, 0x7F) || // Stergem IRQ
+        !scriereRegistru(0x0A, 0x80) || // Golim FIFO
+        !scriereRegistru(0x0D, 0x00))   // 8 biti/octet
+    {
+        return false;
+    }
+
+    // Introducem datele in FIFO;
+    for (uint8_t i = 0; i < lungime; i++)
+    {
+        if (!scriereRegistru(0x09, date[i]))
+        {
+            return false;
+        }
+    }
+
+    // Pornim transmisia radio;
+    if (!scriereRegistru(0x01, 0x0C) || // Transceive
+        !scriereRegistru(0x0D, 0x80))   // StartSend
+    {
+        return false;
+    }
+
+    uint8_t irq = 0;
+    uint32_t timpStart = HAL_GetTick();
+
+    // Asteptam confirmarea cardului, maximum 30 ms;
+    while ((HAL_GetTick() - timpStart) < 30U)
+    {
+        if (!citireRegistru(0x04, irq))
+        {
+            scriereRegistru(0x01, 0x00);
+            return false;
+        }
+
+        // RxIRq, ErrIRq sau TimerIRq;
+        if ((irq & 0x23) != 0)
+        {
+            break;
+        }
+    }
+
+    // Citim informatiile despre raspuns;
+    uint8_t erori = 0;
+    uint8_t nrOcteti = 0;
+    uint8_t control = 0;
+
+    if (!citireRegistru(0x06, erori)    ||
+        !citireRegistru(0x0A, nrOcteti) ||
+        !citireRegistru(0x0C, control))
+    {
+        return false;
+    }
+
+    // Incheiem comanda Transceive;
+    if (!scriereRegistru(0x0D, 0x00) ||
+        !scriereRegistru(0x01, 0x00))
+    {
+        return false;
+    }
+
+    // Verificam erorile, exceptand CRCErr;
+    // Raspunsul ACK nu contine CRC;
+    if ((erori & 0xDB) != 0)
+    {
+        setEroare(EroareRFID::EroareScriere);
+        return false;
+    }
+
+    // Verificam daca am primit un raspuns;
+    if ((irq & 0x20) == 0)
+    {
+        setEroare(EroareRFID::Timeout);
+        return false;
+    }
+
+    // ACK ocupa un octet FIFO, dar are doar 4 biti valizi;
+    if (nrOcteti != 1 || (control & 0x07) != 4)
+    {
+        setEroare(EroareRFID::EroareScriere);
+        return false;
+    }
+
+    // Citim raspunsul din FIFO;
+    uint8_t ack = 0;
+
+    if (!citireRegistru(0x09, ack))
+    {
+        return false;
+    }
+
+    // Verificam cei 4 biti semnificativi ai raspunsului;
+    if ((ack & 0x0F) != 0x0A)
+    {
+        setEroare(EroareRFID::EroareScriere);
+        return false;
+    }
+
+    setEroare(EroareRFID::NicioEroare);
+    return true;
+}
+
+
+/*  
+
+  - Spre deosebire de citire, scrierea se realizează în două 
+  etape, conform datasheet-ului NXP, secțiunea 12.3, pagina 22. 
+
+*/
+uint8_t Cititor_RFID::scrieBloc()
+{
+
+}

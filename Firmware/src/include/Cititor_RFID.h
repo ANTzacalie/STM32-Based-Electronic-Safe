@@ -46,119 +46,133 @@ class Cititor_RFID {
 
     public:
 
-        // Initializeaza modul RFID,
-        /*
+      // Initializeaza modul RFID,
+      /*
           - Va configura porturile(perifericele) necesare MFRC522;
           - Va configura comunicatia SPI cu MFRC522;
           - si registrele necesare functionarii cititorului;
-        */
-        Cititor_RFID();
+      */
+      Cititor_RFID();
 
-        uint8_t stocareCard();
-        uint8_t verificaCard();
+      uint8_t stocareCard();
+      uint8_t verificaCard();
 
-        // Returneaza ultima eroare inregistrata
-        EroareRFID getUltimaEroare() const 
-        {
+      // Returneaza ultima eroare inregistrata
+      EroareRFID getUltimaEroare() const 
+      {
           return ultimaEroare;
-        }
+      }
 
-        // Gestioneaza ultima eroare aparuta, returnand tipul erorii;
-        EroareRFID handleEroare();
+      // Gestioneaza ultima eroare aparuta, returnand tipul erorii;
+      EroareRFID handleEroare();
 
-        // returneaza versiunea hardware a MFRC522 gasita, returneaza zero daca SPI esueaza;
-        uint8_t citesteVersiune(); 
+      // returneaza versiunea hardware a MFRC522 gasita, returneaza zero daca SPI esueaza;
+      uint8_t citesteVersiune(); 
 
-        // testeaza comunicatia SPI prin scriere si citire.
-        uint8_t testComunicareSPI();
+      // testeaza comunicatia SPI prin scriere si citire.
+      uint8_t testComunicareSPI();
 
-        // citeste registrul specifica, *doar pt teste;
-        uint8_t citesteRegistruTest(uint8_t reg);
+      // citeste registrul specifica, *doar pt teste;
+      uint8_t citesteRegistruTest(uint8_t reg);
 
-        /*
-         - Mai multe informatii in .cpp;
-         - Trimite REQA si asteapta ATQA.
-         - atqa - buffer pentru cei doi octeti receptionati.
-         - Returneaza:
-           -> 1 - Card detectat si raspuns ATQA valid.
-           -> 0 - Card absent sau eroare.
-        */
-        uint8_t detecteazaCard(uint8_t atqa[2]);
+      /*
+        - Mai multe informatii in .cpp;
+        - Trimite REQA si asteapta ATQA.
+        - atqa - buffer pentru cei doi octeti receptionati.
+        - Returneaza:
+          -> 1 - Card detectat si raspuns ATQA valid.
+          -> 0 - Card absent sau eroare.
+      */
+      uint8_t detecteazaCard(uint8_t atqa[2]);
 
-        /*
-         - Executa primul nivel de anticollision (CL1).
-         - uidCL1 - Buffer de 5 octeti, forma -> 4 octeti identificare + 1 octet BCC.
+      /*
+        - Executa primul nivel de anticollision (CL1).
+        - uidCL1 - Buffer de 5 octeti, forma -> 4 octeti identificare + 1 octet BCC.
         
-         -Returneaza:
-            -> 1 - Raspuns valid.
-            -> 0 - Eroare sau timeout.
-        */
-        uint8_t citesteUID_CL1(uint8_t uidCL1[5]);
+        -Returneaza:
+          -> 1 - Raspuns valid.
+          -> 0 - Eroare sau timeout.
+      */
+      uint8_t citesteUID_CL1(uint8_t uidCL1[5]);
 
-        /*
-          - Comanda SELECT pentru Cascade Level 1 contine 9 octeti transmisi catre card, 7 de comanda si 2 octeti CRC_A: 93 70 UID0 UID1 UID2 UID3 BCC CRC_L CRC_H
-          -> ultimi doi octeti sunt CRC_A folosit la verificarea integritati mesajului;
+      /*
+        - Comanda SELECT pentru Cascade Level 1 contine 9 octeti transmisi catre card, 7 de comanda si 2 octeti CRC_A: 93 70 UID0 UID1 UID2 UID3 BCC CRC_L CRC_H
+        -> ultimi doi octeti sunt CRC_A folosit la verificarea integritati mesajului;
 
-          - Calculeaza CRC_A folosind coprocesorul MFRC522.
-            # date    - bufferul de date pentru calcul.
-            # lungime - numarul de octeti.
-            # crc     - buffer de 2 octeti: CRC_L, CRC_H.
-          - Returneaza true la succes, false la eroare.
-        */
-        bool calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t crc[2]);    
+        - Calculeaza CRC_A folosind coprocesorul MFRC522.
+          # date    - bufferul de date pentru calcul.
+          # lungime - numarul de octeti.
+          # crc     - buffer de 2 octeti: CRC_L, CRC_H.
+        - Returneaza true la succes, false la eroare.
+      */
+      bool calculeazaCRC_A(const uint8_t *date, uint8_t lungime, uint8_t crc[2]);    
         
-        uint8_t selecteazaCard_CL1(const uint8_t uidCL1[5], uint8_t &sak);
+      uint8_t selecteazaCard_CL1(const uint8_t uidCL1[5], uint8_t &sak);
 
-        // Autentifica accesul la un block folosind Key A;
-        uint8_t autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], const uint8_t uid[4]);
+      // Autentifica accesul la un block folosind Key A;
+      uint8_t autentificaBlocKeyA(uint8_t bloc, const uint8_t cheie[6], const uint8_t uid[4]);
 
-        /*
-          - Inchide sesiunea Crypto1 si reseteaza *** TEST
-          starea cardului prin intreruperea campului RF.
-        */
-        bool resetareSesiuneRFID();
+      /*
+        - Inchide sesiunea Crypto1 si reseteaza *** TEST
+        starea cardului prin intreruperea campului RF.
+      */
+      bool resetareSesiuneRFID();
 
-        /*
-          - Citeste cei 16 octeti ai unui bloc MIFARE Classic;
-          - Necesita autentificarea prealabila a sectorului;
-          - MIFARE 1K are 16 sectoare a cate 64 biti fiecare;
+      /*
+        - Citeste cei 16 octeti ai unui bloc MIFARE Classic;
+        - Necesita autentificarea prealabila a sectorului;
+        - MIFARE 1K are 16 sectoare a cate 64 biti fiecare;
  
-          - Returneaza:
-            # 1 - Citire reusita si CRC valid;
-            # 0 - Eroare;
+        - Returneaza:
+          # 1 - Citire reusita si CRC valid;
+          # 0 - Eroare;
       */
       uint8_t citesteBloc(uint8_t bloc, uint8_t date[16]);
 
+      /*
+       - Scrie 16 octeti intr-un bloc de date MIFARE Classic.
+       - Necesita autentificarea prealabila a sectorului.
+      
+       -> 1 - Scriere reusita.
+       -> 0 - Eroare.
+      */
+      uint8_t scrieBloc(uint8_t bloc, const uint8_t date[16]);
+
     private:
 
-        // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;
-        bool activareAntena();        
-        /*
-          - Citeste un registru intern al MFRC522 prin SPI
+      // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;
+      bool activareAntena();        
+      /*
+        - Citeste un registru intern al MFRC522 prin SPI
           Are doi paramatrii:
             1. Adresa registrului;
             2. Variabila in care salvam rezultatul;
-        */        
-        bool citireRegistru(uint8_t reg, uint8_t &val);
+      */        
+      bool citireRegistru(uint8_t reg, uint8_t &val);
         
-        // initializare pini prin HAl;
-        void initializarePini();
+      // initializare pini prin HAl;
+      void initializarePini();
 
-        // Structura speciala definita in HAL, care contine info necesare administrari SPI;
-        // Handle HAL pentru perifericul SPI si starea comunicatiei cu modulul MRFC522;
-        SPI_HandleTypeDef hspi1 = {};
+      // Structura speciala definita in HAL, care contine info necesare administrari SPI;
+      // Handle HAL pentru perifericul SPI si starea comunicatiei cu modulul MRFC522;
+      SPI_HandleTypeDef hspi1 = {};
 
-        // initializare spi1 prin HAL;
-        void initializareSPI();
+      // initializare spi1 prin HAL;
+      void initializareSPI();
 
-        // instanta eroare cu ultima eroare = 0 (default)
-        EroareRFID ultimaEroare = EroareRFID::NicioEroare;
+      // instanta eroare cu ultima eroare = 0 (default)
+      EroareRFID ultimaEroare = EroareRFID::NicioEroare;
 
-        // Inregistreaza o eroare noua, folosita doar de clasa intern;
-        void setEroare(EroareRFID eroare);
+      // Inregistreaza o eroare noua, folosita doar de clasa intern;
+      void setEroare(EroareRFID eroare);
 
-        // Scrie un octet intr-un registru MFRC522.
-        bool scriereRegistru(uint8_t registru, uint8_t valoare);
+      // Scrie un octet intr-un registru MFRC522.
+      bool scriereRegistru(uint8_t registru, uint8_t valoare);
+
+      /*
+        - Transmite un cadru complet catre card si verifica raspunsul ACK de 4 biti;
+      */
+      bool transmite_cu_ACK(const uint8_t *date, uint8_t lungime);
 
     protected:
 

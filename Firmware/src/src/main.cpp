@@ -35,16 +35,8 @@ void MFRC522_RFID_INIT() {
         // pas1. detectam cardul prin REQA 1 = raspuns valid, 0 = card absent/eroare;
         uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
 
-        uint8_t uidCitit = 0;
-        if(cardDetectat == 1) uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
-
-        uint8_t dateSelect[7] = {
-            0x93, 0x70,
-            0x55, 0x88, 0xF0, 0x06, 0x2B
-        };
-
-        // Buffer pentru cei doi octeti CRC.
-        uint8_t crc[2] = {0};
+        
+        if(cardDetectat == 1) cititor_mfrc522.citesteUID_CL1(uidCL1);
 
         // Testam SELECT numai daca ANTICOLLISION a reusit;
         uint8_t sak = 0;
