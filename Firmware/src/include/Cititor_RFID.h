@@ -172,7 +172,7 @@ class Cititor_RFID {
       /*
         - Transmite un cadru complet catre card si verifica raspunsul ACK de 4 biti;
       */
-      bool transmite_cu_ACK(const uint8_t *date, uint8_t lungime);
+      bool transmite_cu_ack(const uint8_t *date, uint8_t lungime);
 
     protected:
 

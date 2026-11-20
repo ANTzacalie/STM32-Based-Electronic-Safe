@@ -1240,7 +1240,7 @@ uint8_t Cititor_RFID::citesteBloc(uint8_t bloc, uint8_t date[16])
  
  - Bufferul primit trebuie sa contina deja CRC_A.
 */
-bool Cititor_RFID::transmite_cu_ACK(const uint8_t *date, uint8_t lungime)
+bool Cititor_RFID::transmite_cu_ack(const uint8_t *date, uint8_t lungime)
 {
     // Pregatim registrele pentru transmisie;
     if (!scriereRegistru(0x01, 0x00) || // Idle
@@ -1359,14 +1359,63 @@ bool Cititor_RFID::transmite_cu_ACK(const uint8_t *date, uint8_t lungime)
   - Scriem un bloc de date MIFARE Classic 1K folosind procedura WRITE in doua etape.
 
 */
-uint8_t Cititor_RFID::scrieBloc(uint8_t bloc, const uint8_t data[16])
+uint8_t Cititor_RFID::scrieBloc(uint8_t bloc, const uint8_t date[16])
 {
 
     /*
-       - Verificam argumentele;
-       - Protejam temporar MANUFACTURER BLOACK (0) si toate blcurile SECTOR TRAILER;
+        - Verificam argumentele;
+        - Protejam temporar MANUFACTURER BLOACK (0) si toate blcurile SECTOR TRAILER;
     */
 
+    // verifcam ca data sa nu fie null , bloc nu mai mare de 63, nu egal cu 0 iar bloc % 4 == 3 sa nu scriem in SECTOR TRAILER
+    if (date == nullptr || bloc > 63 || bloc == 0 || (bloc % 4) == 3)
+    {
+        setEroare(EroareRFID::EroareScriere);
+        return 0;
+    }
     
+    // Verificam daca sesiunea Crypto1 este activa;
+    uint8_t status2 = 0;
+
+    if(!citireRegistru(0x08, status2))
+        return 0;
+    if((status2 && 0x08) == 0)
+    {
+        setEroare(EroareRFID::AutentificareEsuata);
+        return 0;
+    }
+
+    /*
+        - ETAPA 1:
+        Pregatim comanda WRITE si adresa blocului;
+    */
+    uint8_t comanda[4] = {0xA0, bloc, 0, 0};
+    if(!calculeazaCRC_A(comanda, 2, &comanda[2]))
+        return 0;
+    
+    /*
+        - Pregatim pentru ETAPA 2:
+        -> 16 octeti de date + 2 octeti CRC_A
+    */
+    uint8_t buffer[18] = {0};
+    for(uint8_t i = 0; i < 16; i++)
+    {
+        buffer[i] = date[i];
+    }
+
+    if(!calculeazaCRC_A(buffer, 16, &buffer[16]))
+        return 0;
+
+    // Transmitem comanda WRITE si verificam primul ACK;
+    if(!transmite_cu_ack(comanda, 4))
+        return 0;
+    
+    // Transmitem datele si verificam al doilea ACK;
+    if(!transmite_cu_ack(buffer, 18))
+        return 0;
+    
+    // Ambele etape au fost confirmate de card cu succes;
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
 
 }

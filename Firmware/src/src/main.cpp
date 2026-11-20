@@ -43,7 +43,7 @@ void MFRC522_RFID_INIT() {
 
         uint8_t selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
 
-        // Cheia implicita MIFARE Classic;;
+        // Cheia implicita MIFARE Classic pe o cartele goala;;
         uint8_t keyA[6] = {
             0xFF, 0xFF, 0xFF,
             0xFF, 0xFF, 0xFF
@@ -73,19 +73,48 @@ void MFRC522_RFID_INIT() {
 
         volatile EroareRFID eroareAutentificare = cititor_mfrc522.getUltimaEroare();
         
-        // breakpoint
+        // Datele pe care dorim sa le scriem in blocul 4.
+        uint8_t dateScriere[16] = {
+            0x11, 0x22, 0x33, 0x44,
+            0x55, 0x66, 0x77, 0x88,
+            0x99, 0xAA, 0xBB, 0xCC,
+            0xDD, 0xEE, 0xFF, 0x10
+        };
+
+        // Buffer pentru verificarea datelor scrise.
+        uint8_t dateVerificare[16] = {0};
+
+        volatile uint8_t blocScris = 0;
+        volatile uint8_t blocRecitit = 0;
+
+        if (autentificat == 1)
+        {
+            // Scriem datele in memoria cardului.
+            blocScris = cititor_mfrc522.scrieBloc(4, dateScriere);
+
+            // Recitim blocul numai daca scrierea a reusit.
+            if (blocScris == 1)
+            {
+                blocRecitit = cititor_mfrc522.citesteBloc(4, dateVerificare);
+            }
+            
+        }
+
+        // Salvam eroarea inainte de resetarea sesiunii.
+        volatile EroareRFID eroareScriere = cititor_mfrc522.getUltimaEroare();
+
+        // Breakpoint aici.
         __NOP();
 
-        // Reset sesiune MFRC522;
-        volatile bool sesiuneResetata = cititor_mfrc522.resetareSesiuneRFID();
         
         HAL_Delay(200);
-        
+
     }
-    
+
     // ############ TEST ############# //
 
 }
+
 /////////////////////// MFRC522 RFID ///////////////////////
 
 int main(void)
