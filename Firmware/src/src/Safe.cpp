@@ -1,3 +1,7 @@
 #include "../include/Safe.h"
 
-// TODO
+
+Safe::Safe() 
+{
+    // TODO
+}

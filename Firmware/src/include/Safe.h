@@ -17,6 +17,8 @@ class Safe {
 
     public:
 
+        Safe();
+
     private:
 
     protected:

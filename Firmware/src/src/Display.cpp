@@ -10,6 +10,6 @@ Display::Display()
 
 bool Display::begin()
 {
-    ready_ = false; //invalidare a vechii confirmari de comunicare, inclusiv la o reinitializare ceruta
-    address_ = 0; //resetare adresa memorata pentru a repeta detectarea modulului
+    //ready_ = false; //invalidare a vechii confirmari de comunicare, inclusiv la o reinitializare ceruta
+    //address_ = 0; //resetare adresa memorata pentru a repeta detectarea modulului
 }

@@ -1232,3 +1232,4 @@ uint8_t Cititor_RFID::citesteBloc(uint8_t bloc, uint8_t date[16])
     setEroare(EroareRFID::NicioEroare);
     return 1;
 }
+
