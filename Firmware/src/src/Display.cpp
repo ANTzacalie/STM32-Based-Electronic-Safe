@@ -18,8 +18,7 @@ bool Display::begin()
     pins.Pin = GPIO_PIN_6 | GPIO_PIN_7;                     //Selecteaza impreuna PB6 (=SCL) si PB7 (=SDA)
     pins.Mode = GPIO_MODE_AF_OD;                            //Selecteaza functia alternativa open-drain folosita de I2C
     pins.Speed = GPIO_SPEED_FREQ_HIGH;                      //Stabileste viteza de ccomutare a pinilor; frecventa magistralei se seteaza separat.
-    HAL_GPIO_Init(GPIOB, &pins);                            //Aplica configuratia prin HAL, trmitand adresa structurii pins
-    I2C_HandleTypeDef i2c = {};                              //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero   
+    HAL_GPIO_Init(GPIOB, &pins);                            //Aplica configuratia prin HAL, trmitand adresa structurii pins   
     i2c.Instance = I2C1;                                    //Leaga handle-lul clasei de perifericul I2C1; nu acceseaza manual registrii acestuia
     i2c.Init.ClockSpeed = 100000;                           //Frecventa I2C initiata la 100 kHz
     i2c.Init.DutyCycle = I2C_DUTYCYCLE_2;                 //Completeaza configuratia duty-cycle ceruta de HAL

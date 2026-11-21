@@ -37,6 +37,8 @@ class Display
 
 
     private:
+            I2C_HandleTypeDef i2c = {};                              //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
+
 };
 
 #endif
