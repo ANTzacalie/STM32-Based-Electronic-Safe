@@ -59,15 +59,21 @@ bool Display::begin()
         }
     
     const uint8_t commands[] = {        //Pregatire comenzilor doar pentru controlerul OLED
-        0xAE,                           // Display OFF
+        0xAE,                           // Display OFF/stinge temporar display-ul pentru a nu afisa datele de initializare
         0xD5, 0x80,                     // Configureaza ceasul intern/divizorul display-ului
         0xA8, 0x1F,                     // Selecteaza inaltimea display-ului la 32 linii/multiplexarea la 32 de linii: valoarea transmisa este 32-1
         0xD3, 0x00,                     // Seteaza offset-ul display-ului la 0 (vertical offset)
         0x40,                           // Seteaza start line la 0
         0x8D, 0x14,                     // Activeaza charge pump-ul intern al display-ului/pompa de sarcina folosita de modulul SSD1306
         0x20, 0x00,                     // Seteaza modul de adresare orizontala a memoriei display-ului
-        0xA1, 0xC8                    // Seteaza orientarea segmentelor si sensul scanarii COM
-        
+        0xA1, 0xC8,                     // Seteaza orientarea segmentelor si sensul scanarii COM
+        0xDA, 0x02,                     // Seteaza configuratia pinilor COM/ selecteaza configuratia COM pentru panoul 128x32
+        0x81, 0x01,                     // Seteaza nivelul de contrast la valoarea minima (1)
+        0xD9, 0xF1,                     // Seteaza modul de preincarcare la valoarea uzuala (0xF1)/configureaza intervalul de preincarcare al panoului
+        0xDB, 0x40,                     // Configureaza nivelul de descarcare VCOMHa (al panoului la valoarea uzuala (0x40)), comportamentul se verifica pe modelul fizic
+        0xA4,                           // Seteaza modul de afisare normal (nu se ignora continutul memoriei RAM)
+        0xA6,                           // Seteaza modul de afisare normal (nu se inverseaza continutul memoriei RAM)
+        0xAF                            // Display ON /porneste afisarea dupa configurarea parametrilor
     };
 
     return 1;
