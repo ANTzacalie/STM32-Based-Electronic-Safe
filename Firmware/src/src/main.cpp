@@ -41,7 +41,7 @@ void MFRC522_RFID_INIT()
         0xFF, 0xFF, 0xFF
     };
 
-    // Noua Key A pentru sectorul 1.
+    // Noua Key A pentru sectorul 1. Facuta veche pentru reverse
     const uint8_t cheieVeche[6] = {
         0xA7, 0x31, 0xE8,
         0x42, 0xB9, 0x6C
