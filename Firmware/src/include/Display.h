@@ -37,7 +37,9 @@ class Display
 
 
     private:
-            I2C_HandleTypeDef i2c = {};                              //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
+        I2C_HandleTypeDef i2c = {};   //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
+        uint16_t address_ = 0; //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
+        bool ready_ = false; //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
 
 };
 

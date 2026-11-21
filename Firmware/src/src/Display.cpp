@@ -10,8 +10,8 @@ Display::Display()
 
 bool Display::begin()
 {
-    //ready_ = false; //invalidare a vechii confirmari de comunicare, inclusiv la o reinitializare ceruta
-    //address_ = 0; //resetare adresa memorata pentru a repeta detectarea modulului
+    ready_ = false; //invalidare a vechii confirmari de comunicare, inclusiv la o reinitializare ceruta
+    address_ = 0; //resetare adresa memorata pentru a repeta detectarea modulului
     __HAL_RCC_GPIOB_CLK_ENABLE();                           //Activare ceas GPIOB prin macro-ul HAL necesar configurarii PB6/PB7
     __HAL_RCC_I2C1_CLK_ENABLE();                            //Activeaza ceasul in I2C1 prin HAL
     GPIO_InitTypeDef pins = {};                             //Pregateste structura de configurare ceruta de HAL, cu toate campurile initial zero
