@@ -25,8 +25,8 @@ bool Display::begin()
     i2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;      //Foloseste adrese I2C pe 7 biti pentru dispozitive
     i2c.Init.OwnAddress1 = 0;                               //Nu foloseste adresa proprie a microcontrolerului deorece STM32 este masterul comunicatiei
     //i2c.Init.DualAddressMode = I2C_DUALADDRESSDISABLE;      //Dezactiveaza a doua adresa proprie, nefolosita de OLED
-    i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;      //Dezactiveaza raspunsul perifericului la general-call.
-    i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;          //Dezactiveaza modul de intindere a semnalului SCL, nefolosit de OLED
+    i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;     //Dezactiveaza raspunsul perifericului la general-call.
+    i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;         //Dezactiveaza modul de intindere a semnalului SCL, nefolosit de OLED
 
 
     if (HAL_I2C_Init(&i2c) != HAL_OK) //Verifica daca HAL a reusit initializarea magistralei
@@ -52,12 +52,14 @@ bool Display::begin()
             return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
         }
     
+
     if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
         {
             lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
             return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
         }
     
+
     const uint8_t commands[] = {        //Pregatire comenzilor doar pentru controlerul OLED
         0xAE,                           // Display OFF/stinge temporar display-ul pentru a nu afisa datele de initializare
         0xD5, 0x80,                     // Configureaza ceasul intern/divizorul display-ului
@@ -75,6 +77,15 @@ bool Display::begin()
         0xA6,                           // Seteaza modul de afisare normal (nu se inverseaza continutul memoriei RAM)
         0xAF                            // Display ON /porneste afisarea dupa configurarea parametrilor
     };
+
+
+    if (!sendCommands(commands, uint8_t(sizeof commands))) //Trimite secventa de comenzi si verifica rezultatul transferului
+    { 
+        return false;                                      //Propaga eroarea I2C deja retinuta de sendCommands
+    } 
+    clear();                                               //Sterge bufferul local de pixeli, fara a transmite inca un cadru separat
+    
+
 
     return 1;
 }
