@@ -102,6 +102,31 @@ void MFRC522_RFID_INIT() {
 
         // Salvam eroarea inainte de resetarea sesiunii.
         volatile EroareRFID eroareScriere = cititor_mfrc522.getUltimaEroare();
+        
+        // Buffer pentru citirea Sector Trailer (blocul 7).
+        uint8_t sectorTrailer[16] = {0};
+
+        // Retinem rezultatul citirii.
+        volatile uint8_t trailerCitit = 0;
+
+        if (autentificat == 1)
+        {
+            /*
+            - Citim blocul 7 din sectorul 1.
+            - Nu modificam nimic in memoria cardului.
+            */
+            trailerCitit = cititor_mfrc522.citesteBloc(7, sectorTrailer);
+        }
+
+        /*
+            - Extragem octetii care controleaza drepturile de acces ale sectorului.
+        */
+        volatile uint8_t accessByte6 = sectorTrailer[6];
+        volatile uint8_t accessByte7 = sectorTrailer[7];
+        volatile uint8_t accessByte8 = sectorTrailer[8];
+        volatile uint8_t generalPurposeByte = sectorTrailer[9];
+
+        
         cititor_mfrc522.resetareSesiuneRFID();
 
         // Breakpoint aici.

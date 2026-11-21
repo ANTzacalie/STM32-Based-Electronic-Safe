@@ -88,7 +88,7 @@ void Cititor_RFID::initializarePini()
 }
 
 /*
-  - Conform datasheetulil MFRC522, sectiunea 8.1.2, cititorul comunica prin SPI
+  - Conform datasheet MFRC522, sectiunea 8.1.2, cititorul comunica prin SPI
   si functioneaza ca Slave, Microcontrollerul fiind necesar sa fie Master, adica el controleaza comunicatia.
 
   - Initializarea perifericului SPI1.
@@ -1375,11 +1375,11 @@ uint8_t Cititor_RFID::scrieBloc(uint8_t bloc, const uint8_t date[16])
     }
     
     // Verificam daca sesiunea Crypto1 este activa;
-    uint8_t status2 = 0;
+    uint8_t cryp1_s = 0; // se intelege mai bine
 
-    if(!citireRegistru(0x08, status2))
+    if(!citireRegistru(0x08, cryp1_s))
         return 0;
-    if((status2 && 0x08) == 0)
+    if((cryp1_s && 0x08) == 0)
     {
         setEroare(EroareRFID::AutentificareEsuata);
         return 0;
@@ -1419,3 +1419,5 @@ uint8_t Cititor_RFID::scrieBloc(uint8_t bloc, const uint8_t date[16])
     return 1;
 
 }
+
+
