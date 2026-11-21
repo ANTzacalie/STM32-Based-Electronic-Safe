@@ -27,12 +27,28 @@ bool Display::begin()
     //i2c.Init.DualAddressMode = I2C_DUALADDRESSDISABLE;      //Dezactiveaza a doua adresa proprie, nefolosita de OLED
     i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;      //Dezactiveaza raspunsul perifericului la general-call.
     i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;          //Dezactiveaza modul de intindere a semnalului SCL, nefolosit de OLED
+
+
     if (HAL_I2C_Init(&i2c) != HAL_OK) //Verifica daca HAL a reusit initializarea magistralei
     { //Deschide tratarea erorii de initializare I2C
         lastError = EroareDisplay::InitializareI2CEsuata; //Retine codul erorii de configurare HAL, dupa modelul lui Antonio
         return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
     } //Inchide tratarea esecului HAL_I2C_Init
+    
 
+    for (uint8_t addr = 0x3C; addr <= 0x3D; ++addr)     //Incearca cele doua adrese uzuale SSD1306 pe 7 biti
+        {
+            if (HAL_I2C_IsDeviceReady(&i2c,uint16_t (addr << 1), 3, 10) == HAL_OK) //Verifica daca OLED-ul raspunde la adresa curenta
+            {
+                address = addr << 1; //Salveaza adresa OLED in format HAL (8 biti)
+                break; 
+            }
+        }
+        if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
+        {
+            lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
+            return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
+        }
     
 
     
