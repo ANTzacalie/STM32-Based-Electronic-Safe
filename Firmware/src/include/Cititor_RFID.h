@@ -138,6 +138,10 @@ class Cititor_RFID {
       */
       uint8_t scrieBloc(uint8_t bloc, const uint8_t date[16]);
 
+      // Modifica Key A a sectorului specificat,
+      // pastrand drepturile de acces existente.
+      uint8_t modificaKeyA(uint8_t sector, const uint8_t cheieVeche[6], const uint8_t cheieNoua[6]);
+
     private:
 
       // Initializeaza circuitul RF de 13,56 Mhz, mai multe in .cpp;
