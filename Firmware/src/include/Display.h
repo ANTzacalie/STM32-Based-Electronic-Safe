@@ -15,7 +15,7 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
                                 //Verificare configurare I2C1 si a pinilor PB6/PB7, acest cod nu spune singur cauza exacta
     DisplayFaraRaspuns,         //Nu s-a primit raspuns de la OLED
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
-    ComenziInvalide            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
+    ComenziInvalide             //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
 
 };
 
@@ -40,7 +40,7 @@ class Display
         I2C_HandleTypeDef i2c = {};   //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
         uint16_t address = 0; //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
         bool ready = false; //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
-
+        EroareDisplay lastError = EroareDisplay::Neinitializat; //ultima eroare de comunicatie sau de parametrii primiti de metodele de afisare
 };
 
 #endif
