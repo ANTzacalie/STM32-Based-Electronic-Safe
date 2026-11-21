@@ -32,6 +32,7 @@ class Display
 
         void clear(); //sterge numai memoria de pixeli din RAM; 
         void drawPixel(int x, int y, bool on = true); //aprinde/stinge un pixel valid din buffer; implicit on=true
+        bool update(); //trimite paginile modificate catre OLED; false inseamna ca OLED-ul nu a raspuns sau a esuat transferul
         
 
 
@@ -39,10 +40,11 @@ class Display
     private:
         I2C_HandleTypeDef i2c = {};   //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
         uint16_t address = 0; //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
+        uint8_t dirtyPages = 0; //Ceii patru biti inferiori indica paginile de cate 8 linii care trebuie retransmise
         bool ready = false; //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
         EroareDisplay lastError = EroareDisplay::Neinitializat; //ultima eroare de comunicatie sau de parametrii primiti de metodele de afisare
         bool sendCommands(const uint8_t* commands, uint8_t length); //trimite comenzi SSD1306 si returneaza succesul transferului (cel mult 31 de comenzi/parametrii SSD1306 cu prefixul de control 0x00)
-        
+
 };
 
 #endif

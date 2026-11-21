@@ -84,8 +84,7 @@ bool Display::begin()
         return false;                                      //Propaga eroarea I2C deja retinuta de sendCommands
     } 
     clear();                                               //Sterge bufferul local de pixeli, fara a transmite inca un cadru separat
-    
-
-
-    return 1;
+    dirtyPages = 0x0F;                                     //Forteaza trimiterea tuturor celor patru pagini, chiar daca bufferul era deja gol
+    ready = true;                                          //Permite update dupa transmiterea reusita a secventei de configurare
+    return update();                                       //Trimite cadrul initial gol; false inseamna ca nici initializarea completa nu a reusit
 }
