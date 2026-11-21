@@ -44,14 +44,31 @@ bool Display::begin()
                 break; 
             }
         }
-        if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
+
+
+    if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
         {
             lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
             return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
         }
     
-
+    if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
+        {
+            lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
+            return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
+        }
     
+    const uint8_t commands[] = {        //Pregatire comenzilor doar pentru controlerul OLED
+        0xAE,                           // Display OFF
+        0xD5, 0x80,                     // Configureaza ceasul intern/divizorul display-ului
+        0xA8, 0x1F,                     // Selecteaza inaltimea display-ului la 32 linii/multiplexarea la 32 de linii: valoarea transmisa este 32-1
+        0xD3, 0x00,                     // Seteaza offset-ul display-ului la 0 (vertical offset)
+        0x40,                           // Seteaza start line la 0
+        0x8D, 0x14,                     // Activeaza charge pump-ul intern al display-ului/pompa de sarcina folosita de modulul SSD1306
+        0x20, 0x00,                     // Seteaza modul de adresare orizontala a memoriei display-ului
+        0xA1, 0xC8                    // Seteaza orientarea segmentelor si sensul scanarii COM
+        
+    };
 
     return 1;
 }
