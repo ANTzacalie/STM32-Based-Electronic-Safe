@@ -33,7 +33,7 @@ void MFRC522_RFID_INIT() {
         uint8_t uidCL1[5] = {0};
 
         // pas1. detectam cardul prin REQA 1 = raspuns valid, 0 = card absent/eroare;
-        uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
+        volatile uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
 
         
         if(cardDetectat == 1) cititor_mfrc522.citesteUID_CL1(uidCL1);
@@ -75,7 +75,7 @@ void MFRC522_RFID_INIT() {
         
         // Datele pe care dorim sa le scriem in blocul 4.
         uint8_t dateScriere[16] = {
-            0x11, 0x22, 0x33, 0x44,
+            0x11, 0x22, 0xC5, 0x44,
             0x55, 0x66, 0x77, 0x88,
             0x99, 0xAA, 0xBB, 0xCC,
             0xDD, 0xEE, 0xFF, 0x10
@@ -97,11 +97,12 @@ void MFRC522_RFID_INIT() {
             {
                 blocRecitit = cititor_mfrc522.citesteBloc(4, dateVerificare);
             }
-            
+
         }
 
         // Salvam eroarea inainte de resetarea sesiunii.
         volatile EroareRFID eroareScriere = cititor_mfrc522.getUltimaEroare();
+        cititor_mfrc522.resetareSesiuneRFID();
 
         // Breakpoint aici.
         __NOP();
