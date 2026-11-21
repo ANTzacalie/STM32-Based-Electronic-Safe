@@ -17,128 +17,152 @@ extern "C" void SysTick_Handler(void)
 }
 
 /////////////////////// MFRC522 RFID ///////////////////////
-void MFRC522_RFID_INIT() {
-
-    // Initializare clasa cititor;
-    Cititor_RFID cititor_mfrc522;
-
-    // Asteptam stabilizarea cititorului RFID.
-    HAL_Delay(100);
-    
-    // ############ TEST ############# //
+// TEST
+void MFRC522_RFID_INIT()
+{
     while (true)
     {
+     
+    // Constructorul initializeaza GPIO, SPI si antena.
+    Cititor_RFID cititor_mfrc522;
 
-        uint8_t atqa[2] = {0};
-        uint8_t uidCL1[5] = {0};
+    // Permitem stabilizarea modulului RFID.
+    HAL_Delay(100);
 
-        // pas1. detectam cardul prin REQA 1 = raspuns valid, 0 = card absent/eroare;
-        volatile uint8_t cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
+    /*
+     - Configuratia testului:
+        Sectorul 1 - blocuri absolute 4, 5, 6, 7.
+        Key A initiala este cheia implicita MIFARE.
+    */
+    const uint8_t sector = 1;
 
-        
-        if(cardDetectat == 1) cititor_mfrc522.citesteUID_CL1(uidCL1);
+    const uint8_t cheieVeche[6] = {
+        0xFF, 0xFF, 0xFF,
+        0xFF, 0xFF, 0xFF
+    };
 
-        // Testam SELECT numai daca ANTICOLLISION a reusit;
-        uint8_t sak = 0;
+    // Noua Key A pentru sectorul 1.
+    const uint8_t cheieNoua[6] = {
+        0xA7, 0x31, 0xE8,
+        0x42, 0xB9, 0x6C
+    };
 
-        uint8_t selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
+    // Buffere pentru identificarea cardului.
+    uint8_t atqa[2] = {0};
+    uint8_t uidCL1[5] = {0};
+    uint8_t sak = 0;
 
-        // Cheia implicita MIFARE Classic pe o cartele goala;;
-        uint8_t keyA[6] = {
-            0xFF, 0xFF, 0xFF,
-            0xFF, 0xFF, 0xFF
-        };
+    // Variabile pentru inspectarea rezultatelor in debugger;
+    volatile uint8_t cardDetectat = 0;
+    volatile uint8_t uidCitit = 0;
+    volatile uint8_t selectat = 0;
+    volatile uint8_t cheieModificata = 0;
+    volatile uint8_t autentificatCuCheiaNoua = 0;
+    volatile uint8_t blocCitit = 0;
 
-        volatile uint8_t autentificat = 0;
+    volatile bool sesiuneResetata = false;
+    volatile EroareRFID eroareModificare =EroareRFID::NicioEroare;
 
-        if (selectat == 1)
+    /*
+     - PAS 1 - Asteptam prezentarea unui card.
+     
+     - Nu executam modificarea cheii in aceasta bucla.
+     - Bucla este folosita exclusiv pentru detectare.
+    */
+    while (cardDetectat == 0)
+    {
+        cardDetectat = cititor_mfrc522.detecteazaCard(atqa);
+
+        if (cardDetectat == 0)
         {
-            // Autentificam blocul 4 din sectorul 1;
-            autentificat = cititor_mfrc522.autentificaBlocKeyA(
-                4, keyA, uidCL1
-            );
+            HAL_Delay(200);
         }
-
-        // Buffer pentru continutul blocului 4.
-        uint8_t dateBloc[16] = {0};
-
-        // Retinem rezultatul operatiei READ, SECTORUL 0 de pe card, din cele 16;
-        volatile uint8_t blocCitit = 0;
-
-        // Citim blocul numai dupa autentificarea reusita;
-        if (autentificat == 1)
-        {
-            blocCitit = cititor_mfrc522.citesteBloc(4, dateBloc);
-        }
-
-        volatile EroareRFID eroareAutentificare = cititor_mfrc522.getUltimaEroare();
-        
-        // Datele pe care dorim sa le scriem in blocul 4.
-        uint8_t dateScriere[16] = {
-            0x11, 0x22, 0xC5, 0x44,
-            0x55, 0x66, 0x77, 0x88,
-            0x99, 0xAA, 0xBB, 0xCC,
-            0xDD, 0xEE, 0xFF, 0x10
-        };
-
-        // Buffer pentru verificarea datelor scrise.
-        uint8_t dateVerificare[16] = {0};
-
-        volatile uint8_t blocScris = 0;
-        volatile uint8_t blocRecitit = 0;
-
-        if (autentificat == 1)
-        {
-            // Scriem datele in memoria cardului.
-            blocScris = cititor_mfrc522.scrieBloc(4, dateScriere);
-
-            // Recitim blocul numai daca scrierea a reusit.
-            if (blocScris == 1)
-            {
-                blocRecitit = cititor_mfrc522.citesteBloc(4, dateVerificare);
-            }
-
-        }
-
-        // Salvam eroarea inainte de resetarea sesiunii.
-        volatile EroareRFID eroareScriere = cititor_mfrc522.getUltimaEroare();
-        
-        // Buffer pentru citirea Sector Trailer (blocul 7).
-        uint8_t sectorTrailer[16] = {0};
-
-        // Retinem rezultatul citirii.
-        volatile uint8_t trailerCitit = 0;
-
-        if (autentificat == 1)
-        {
-            /*
-            - Citim blocul 7 din sectorul 1.
-            - Nu modificam nimic in memoria cardului.
-            */
-            trailerCitit = cititor_mfrc522.citesteBloc(7, sectorTrailer);
-        }
-
-        /*
-            - Extragem octetii care controleaza drepturile de acces ale sectorului.
-        */
-        volatile uint8_t accessByte6 = sectorTrailer[6];
-        volatile uint8_t accessByte7 = sectorTrailer[7];
-        volatile uint8_t accessByte8 = sectorTrailer[8];
-        volatile uint8_t generalPurposeByte = sectorTrailer[9];
-
-        
-        cititor_mfrc522.resetareSesiuneRFID();
-
-        // Breakpoint aici.
-        __NOP();
-        
-        HAL_Delay(200);
-
     }
 
-    // ############ TEST ############# //
+    /*
+     - PAS 2 - Citim UID-ul si selectam cardul;
+    */
+    uidCitit = cititor_mfrc522.citesteUID_CL1(uidCL1);
 
-}
+    if (uidCitit == 1)
+    {
+        selectat = cititor_mfrc522.selecteazaCard_CL1(uidCL1, sak);
+    }
+
+    /*
+     - PAS 3 - Modificam Key A.
+     - Acceptam numai MIFARE Classic 1K, cu UID complet la Cascade Level 1.
+    */
+    if (selectat == 1 && sak == 0x08 && uidCL1[0] != 0x88)
+    {
+        cheieModificata = cititor_mfrc522.modificaKeyA(sector, uidCL1, cheieVeche, cheieNoua);
+    }
+
+    // Salvam eroarea inainte de resetarea sesiunii;
+    eroareModificare = cititor_mfrc522.getUltimaEroare();
+
+    /*
+     - PAS 4 - Inchidem sesiunea Crypto1 si resetam starea cardului.
+    */
+    sesiuneResetata = cititor_mfrc522.resetareSesiuneRFID();
+
+    /*
+     - PAS 5 - Verificam Key A noua. 
+     - Nu modificam nimic daca scrierea a esuat.
+     - Pentru o noua autentificare trebuie sa repetam REQA, ANTICOLLISION si SELECT.
+    */
+    uint8_t atqa_nou[2] = {0};
+    uint8_t uid_nou[5]  = {0};
+    uint8_t sak_nou = 0;
+
+    uint8_t dateBloc[16] = {0};
+
+    if (cheieModificata == 1 && sesiuneResetata)
+    {
+        HAL_Delay(100);
+
+        uint8_t detectatDinNou = cititor_mfrc522.detecteazaCard(atqa_nou);
+
+        if (detectatDinNou == 1 && cititor_mfrc522.citesteUID_CL1(uid_nou) == 1)
+        {
+            // Verificam ca este acelasi card;
+            bool acelasiCard = true;
+
+            for (uint8_t i = 0; i < 4; i++)
+            {
+                if (uid_nou[i] != uidCL1[i])
+                {
+                    acelasiCard = false;
+                    break;
+                }
+            }
+
+            if (acelasiCard && cititor_mfrc522.selecteazaCard_CL1(uid_nou, sak_nou) == 1 && sak_nou == 0x08)
+            {
+                //Autentificam sectorul 1 folosind noua Key A;
+                autentificatCuCheiaNoua = cititor_mfrc522.autentificaBlocKeyA(4, cheieNoua, uid_nou);
+
+                // Verificam accesul la blocul 4;
+                if (autentificatCuCheiaNoua == 1)
+                {
+                    blocCitit = cititor_mfrc522.citesteBloc(4, dateBloc);
+                }
+            }
+        }
+    }
+
+    // Salvam eroarea de la verificarea noii chei;
+    volatile EroareRFID eroareVerificare = cititor_mfrc522.getUltimaEroare();
+
+    // Inchidem sesiunea RFID dupa verificare;
+    volatile bool sesiuneFinalizata = cititor_mfrc522.resetareSesiuneRFID();
+
+    //verificam rezultatele complete;
+    __NOP();
+    HAL_Delay(100);
+    }
+    
+} // TEST
 
 /////////////////////// MFRC522 RFID ///////////////////////
 

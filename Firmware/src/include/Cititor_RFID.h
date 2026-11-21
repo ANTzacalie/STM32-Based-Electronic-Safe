@@ -138,9 +138,20 @@ class Cititor_RFID {
       */
       uint8_t scrieBloc(uint8_t bloc, const uint8_t date[16]);
 
-      // Modifica Key A a sectorului specificat,
-      // pastrand drepturile de acces existente.
-      uint8_t modificaKeyA(uint8_t sector, const uint8_t cheieVeche[6], const uint8_t cheieNoua[6]);
+      /*
+      
+        - [FF 07 80(Access bits)] [69(GBP)] => Aceasta este configurația transport a MIFARE Classic,
+        care permite modificarea Key A după autentificare.
+        - Modifica Key A a unui sector MIFARE Classic 1K.
+ 
+          sector     - sectorul care va fi modificat.
+          uid        - UID-ul de 4 octeti al cardului selectat.
+          cheieVeche - cheia folosita pentru autentificare.
+          cheieNoua  - noua cheie de 6 octeti.
+ 
+        - Returneaza 1 la succes, 0 la eroare.
+      */
+      uint8_t modificaKeyA(uint8_t sector, const uint8_t uid[4], const uint8_t cheieVeche[6], const uint8_t cheieNoua[6]);
 
     private:
 

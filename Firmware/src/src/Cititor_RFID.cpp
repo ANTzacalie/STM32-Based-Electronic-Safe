@@ -1421,3 +1421,94 @@ uint8_t Cititor_RFID::scrieBloc(uint8_t bloc, const uint8_t date[16])
 }
 
 
+/*
+ - Modifica Key A din Sector Trailer.
+ 
+ - Pentru siguranta, acceptam momentan doar
+ sectoare cu Access Bits impliciti FF 07 80.
+ 
+ - Key B si drepturile de acces sunt pastrate.
+*/
+uint8_t Cititor_RFID::modificaKeyA(uint8_t sector, const uint8_t uid[4], const uint8_t cheieVeche[6], const uint8_t cheieNoua[6])
+{
+
+    // Verificam argumentele si sectorul solicitat;
+    // Sectorul 0 este exclus intentionat;
+    if (sector == 0 || sector >= 16 || uid == nullptr || cheieVeche == nullptr || cheieNoua == nullptr)
+    {
+        setEroare(EroareRFID::EroareScriere);
+        return 0;
+    }
+
+    // Ultimul bloc al sectorului este Sector Trailer;
+    uint8_t blocTrailer = (sector * 4) + 3;
+
+    /*
+     - Autentificam sectorul folosind vechea Key A;
+     - Cardul trebuie sa fie deja selectat;
+    */
+    if (!autentificaBlocKeyA(blocTrailer, cheieVeche, uid))
+        return 0;
+
+    // Citim Sector Trailer existent;
+    uint8_t trailer[16] = {0};
+
+    if (!citesteBloc(blocTrailer, trailer))
+        return 0;
+
+    /*
+     - Acceptam doar configuratia implicita unde Key B este citibila;
+     - Astfel putem pastra toti octetii existenti fara sa distrugem Key B sau Access Bits;
+    */
+    if (trailer[6] != 0xFF ||
+        trailer[7] != 0x07 ||
+        trailer[8] != 0x80)
+    {
+        setEroare(EroareRFID::OperatieNeimplementata);
+        return 0;
+    }
+
+    /*
+     - Inlocuim primii 6 octeti cu noua Key A;
+     - Octetii 6-15 raman nemodificati;
+     */
+    for (uint8_t i = 0; i < 6; i++)
+    {
+        trailer[i] = cheieNoua[i];
+    }
+
+    /*
+     - Pregatim prima etapa WRITE: 0xA0 + adresa blocului + CRC_A;
+     */
+    uint8_t comanda[4] = {0xA0, blocTrailer, 0, 0};
+
+    if (!calculeazaCRC_A(comanda, 2, &comanda[2]))
+        return 0;
+
+    /*
+     - Pregatim a doua etapa WRITE: 16 octeti Sector Trailer + CRC_A;
+     */
+    uint8_t buffer[18] = {0};
+
+    for (uint8_t i = 0; i < 16; i++)
+    {
+        buffer[i] = trailer[i];
+    }
+
+    if (!calculeazaCRC_A(buffer, 16, &buffer[16]))
+        return 0;
+
+    // Prima etapa: comanda WRITE si ACK;
+    if (!transmite_cu_ack(comanda, 4))
+        return 0;
+
+    // A doua etapa: datele si ACK;
+    if (!transmite_cu_ack(buffer, 18))
+        return 0;
+
+    // Cardul a confirmat ambele etape de scriere;
+    setEroare(EroareRFID::NicioEroare);
+    return 1;
+    
+}
+
