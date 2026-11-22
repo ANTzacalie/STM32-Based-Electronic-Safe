@@ -51,10 +51,11 @@ class Display
         //METODA 08 - drawPixel: definitia este in src/Display.cpp, la acelasi numar
         void drawPixel(int x, int y, bool on = true);   //aprinde/stinge un pixel valid din buffer; implicit on=true
 
-        //METODA 09 - drawText: definitia este in src/Display.cpp, la acelasi numar
+        //METODA 09 - update: definitia este in src/Display.cpp, la acelasi numar
         bool update();   //trimite paginile modificate catre OLED; false inseamna ca OLED-ul nu a raspuns sau a esuat transferul
         
-
+        //METODA 10 - drawText: definitia este in src/Display.cpp, la acelasi numar
+        void drawText(int x, int y, const char* value);  //deseneaza un text in bufferul local de pixeli; nu trimite inca un cadru separat
 
 
     private:
@@ -66,6 +67,10 @@ class Display
         bool sendCommands(const uint8_t* commands, uint8_t length);     //trimite comenzi SSD1306 si returneaza succesul transferului (cel mult 31 de comenzi/parametrii SSD1306 cu prefixul de control 0x00)
         bool english = false;                                           //Porneste cu texte in romana; reprezinta doar preferinta vizuala curenta, nu un meniu sau o salvare in Flash
         uint8_t buffer[512] = {};                                       //buffer local de pixeli, 128x32/8=512 octeti; un singur bit pentru fiecare pixel, initial toti pixelii sunt stinsi
+        uint8_t fontColumn(char character, uint8_t column) const;       // Returneaza bitii unei coloane de caracter; nu acceseaza hardware.
+
+
+
 };
 
 #endif

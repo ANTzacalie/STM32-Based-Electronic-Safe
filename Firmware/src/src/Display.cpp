@@ -179,3 +179,27 @@ void Display::drawPixel(int x, int y, bool on)  //Defineste desenarea/stergerea 
     }
 } 
 
+// METODA 09 - drawText: declarata in include/Display.h, la acelasi numar.
+void Display::drawText(int x, int y, const char* value) // Defineste desenarea unui sir primit din exterior.
+{ 
+    if (value == nullptr || x < 0 || y < 0 || y >= 32)  // Respinge pointerul nul si originea din afara zonei verticale sau la stanga panoului.
+    { 
+        return;                                         // Nu citeste un pointer invalid si nu deseneaza in afara framebufferului.
+    } 
+
+
+    for (; *value != '\0' && x <= 123; ++value, x += 6) // Parcurge sirul pana la terminator sau ultima origine la care incape un caracter de cinci pixeli.
+    { 
+        for (uint8_t column = 0; column < 5; ++column)  // Parcurge cele cinci coloane ale caracterului.
+        { 
+            const uint8_t bits = fontColumn(*value, column); // Citeste masca de sapte pixeli verticali din font.
+            for (uint8_t bit = 0; bit < 7; ++bit)            // Parcurge cei sapte biti verticali utili ai mastii.
+            {                                                // Deschide verificarea unui pixel al literei.
+                if ((bits & (1U << bit)) != 0)               // Selecteaza numai pixelii aprinsi din desenul caracterului.
+                { 
+                    drawPixel(x + column, y + bit);          // Foloseste verificarea limitelor si marcarea paginii din drawPixel.
+                } 
+            } 
+        } 
+    } 
+} 
