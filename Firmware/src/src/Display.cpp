@@ -246,4 +246,18 @@ bool Display::update() // Defineste transferul paginilor modificate catre OLED.
 
     lastError = EroareDisplay::NicioEroare; // Marcheaza actualizarea reusita, inclusiv cazul fara pagini de transmis.
     return true;                            // Confirma finalizarea actualizarii; nu exprima starea usii, PIN-ului sau alarmei.
+
+}
+
+// METODA 11 - getBuffer: declarata in include/Display.h, la acelasi numar.
+const uint8_t* Display::getBuffer() const // Defineste accesul la framebuffer pentru verificare vizuala si teste.
+{ 
+    return buffer; // Returneaza un pointer const: apelantul poate inspecta, dar nu modifica pixelii prin acest pointer.
 } 
+
+
+
+
+
+
+ 

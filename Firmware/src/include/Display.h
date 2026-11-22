@@ -58,6 +58,9 @@ class Display
         //METODA 10 - drawText: definitia este in src/Display.cpp, la acelasi numar
         void drawText(int x, int y, const char* value);  //deseneaza un text in bufferul local de pixeli; nu trimite inca un cadru separat
 
+        const uint8_t* getBuffer() const; // Permite citirea celor 512 B in teste, fara a permite modificarea prin pointerul returnat.
+
+
 
     private:
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
