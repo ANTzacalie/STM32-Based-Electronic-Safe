@@ -3,11 +3,13 @@
 #include "Display.h"
 #include <string.h>
 
+//Metoda 1 - Display: declarata in Display.h, la acelasi numar
 Display::Display()
 {
     //Trebuiesc initializate periferice dar nu inainte de HAL_Init
 }
 
+//Metoda 2 - begin: declarata in Display.h, la acelasi numar
 bool Display::begin()
 {
     ready = false; //invalidare a vechii confirmari de comunicare, inclusiv la o reinitializare ceruta
@@ -88,3 +90,17 @@ bool Display::begin()
     ready = true;                                          //Permite update dupa transmiterea reusita a secventei de configurare
     return update();                                       //Trimite cadrul initial gol; false inseamna ca nici initializarea completa nu a reusit
 }
+
+//Metoda 3 - isReady: declarata in Display.h, la acelasi numar
+bool Display::isReady() const       //Defineste citirea starii software a modulului, fara modificarea obiectului
+{
+    return ready;                   //Returneaza rezultatul initializarii/ultimelor transferuri, nu o masurare electrica noua
+}
+
+//metoda 4 - getLastError: declarata in Display.h, la acelasi numar
+EroareDisplay Display::getLastError() const //Defineste metoda declarata in .h; rezultatul este un cod din lista de erori
+{
+    return lastError; //Copiaza ultima eroare catre apelant; nu returneaza un pointer si nu modifica obiectul
+}
+
+

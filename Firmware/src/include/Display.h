@@ -23,15 +23,31 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
 class Display  
 {
     public: // apelare din main sau clasele celorlalti colegi
+        //METODA 01 - Display: definitia este in src/Display.cpp, la acelasi numar
         Display(); //constructor
+
+        //METODA 02 - begin: definitia este in src/Display.cpp, la acelasi numar
         bool begin(); // configurare PB6/PB7 si I2C prin HAL, detectare OLED si trimitere initilizare in SSD1306
+
+        //METODA 03 - isReady: definitia este in src/Display.cpp, la acelasi numar
         bool isReady() const; //returnare initializarea/ultimul transfer a reusit, fara o verificare electronica
-        const char* getLastError() const; //returnarea unui text scurt pentru debugger sau log. un OLED defect nu poate avertiza singur
+
+        //METODA 04 - getLastError: definitia este in src/Display.cpp, la acelasi numar
+        EroareDisplay getLastError() const; //returnareza printr-o valoare eroarea din lista EroareDisplay, fara pointer sau text. un OLED defect nu poate avertiza singur
+
+        //METODA 05 - setEnglish: definitia este in src/Display.cpp, la acelasi numar
         void setEnglish(bool enabled); //selectare numai texte englezesti/romanesti; nu navigheaza si nu salveaza alegerea in Flash
+
+        //METODA 06 - setBrightness: definitia este in src/Display.cpp, la acelasi numar
         bool setBrightness(uint8_t level); //primeste 0=minim, 1=mediu, 2=maxim. apelantul decide cand si de ce schimba nivelul
 
+        //METODA 07 - clear: definitia este in src/Display.cpp, la acelasi numar
         void clear(); //sterge numai memoria de pixeli din RAM; 
+
+        //METODA 08 - drawPixel: definitia este in src/Display.cpp, la acelasi numar
         void drawPixel(int x, int y, bool on = true); //aprinde/stinge un pixel valid din buffer; implicit on=true
+
+        //METODA 09 - drawText: definitia este in src/Display.cpp, la acelasi numar
         bool update(); //trimite paginile modificate catre OLED; false inseamna ca OLED-ul nu a raspuns sau a esuat transferul
         
 
