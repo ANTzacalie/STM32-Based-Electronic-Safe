@@ -31,11 +31,11 @@ bool Display::begin()
     i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;         //Dezactiveaza modul de intindere a semnalului SCL, nefolosit de OLED
 
 
-    if (HAL_I2C_Init(&i2c) != HAL_OK) //Verifica daca HAL a reusit initializarea magistralei
-    { //Deschide tratarea erorii de initializare I2C
+    if (HAL_I2C_Init(&i2c) != HAL_OK)                     //Verifica daca HAL a reusit initializarea magistralei
+    {                                                     
         lastError = EroareDisplay::InitializareI2CEsuata; //Retine codul erorii de configurare HAL, dupa modelul lui Antonio
-        return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
-    } //Inchide tratarea esecului HAL_I2C_Init
+        return false;                                     //Opreste initializarea fara a presupune ca OLED-ul este disponibil
+    } 
     
 
     for (uint8_t addr = 0x3C; addr <= 0x3D; ++addr)     //Incearca cele doua adrese uzuale SSD1306 pe 7 biti
@@ -51,44 +51,44 @@ bool Display::begin()
     if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
         {
             lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
-            return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
+            return false;                                  //Opreste initializarea fara a presupune ca OLED-ul este disponibil
         }
     
 
-    if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
+    if (address == 0)                                      //Daca nu s-a gasit niciun OLED la adresele uzuale
         {
             lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
-            return false; //Opreste initializarea fara a presupune ca OLED-ul este disponibil
+            return false;                                  //Opreste initializarea fara a presupune ca OLED-ul este disponibil
         }
     
 
-    const uint8_t commands[] = {        //Pregatire comenzilor doar pentru controlerul OLED
-        0xAE,                           // Display OFF/stinge temporar display-ul pentru a nu afisa datele de initializare
-        0xD5, 0x80,                     // Configureaza ceasul intern/divizorul display-ului
-        0xA8, 0x1F,                     // Selecteaza inaltimea display-ului la 32 linii/multiplexarea la 32 de linii: valoarea transmisa este 32-1
-        0xD3, 0x00,                     // Seteaza offset-ul display-ului la 0 (vertical offset)
-        0x40,                           // Seteaza start line la 0
-        0x8D, 0x14,                     // Activeaza charge pump-ul intern al display-ului/pompa de sarcina folosita de modulul SSD1306
-        0x20, 0x00,                     // Seteaza modul de adresare orizontala a memoriei display-ului
-        0xA1, 0xC8,                     // Seteaza orientarea segmentelor si sensul scanarii COM
-        0xDA, 0x02,                     // Seteaza configuratia pinilor COM/ selecteaza configuratia COM pentru panoul 128x32
-        0x81, 0x01,                     // Seteaza nivelul de contrast la valoarea minima (1)
-        0xD9, 0xF1,                     // Seteaza modul de preincarcare la valoarea uzuala (0xF1)/configureaza intervalul de preincarcare al panoului
-        0xDB, 0x40,                     // Configureaza nivelul de descarcare VCOMHa (al panoului la valoarea uzuala (0x40)), comportamentul se verifica pe modelul fizic
-        0xA4,                           // Seteaza modul de afisare normal (nu se ignora continutul memoriei RAM)
-        0xA6,                           // Seteaza modul de afisare normal (nu se inverseaza continutul memoriei RAM)
-        0xAF                            // Display ON /porneste afisarea dupa configurarea parametrilor
+    const uint8_t commands[] = {    //Pregatire comenzilor doar pentru controlerul OLED
+        0xAE,                       // Display OFF/stinge temporar display-ul pentru a nu afisa datele de initializare
+        0xD5, 0x80,                 // Configureaza ceasul intern/divizorul display-ului
+        0xA8, 0x1F,                 // Selecteaza inaltimea display-ului la 32 linii/multiplexarea la 32 de linii: valoarea transmisa este 32-1
+        0xD3, 0x00,                 // Seteaza offset-ul display-ului la 0 (vertical offset)
+        0x40,                       // Seteaza start line la 0
+        0x8D, 0x14,                 // Activeaza charge pump-ul intern al display-ului/pompa de sarcina folosita de modulul SSD1306
+        0x20, 0x00,                 // Seteaza modul de adresare orizontala a memoriei display-ului
+        0xA1, 0xC8,                 // Seteaza orientarea segmentelor si sensul scanarii COM
+        0xDA, 0x02,                 // Seteaza configuratia pinilor COM/ selecteaza configuratia COM pentru panoul 128x32
+        0x81, 0x01,                 // Seteaza nivelul de contrast la valoarea minima (1)
+        0xD9, 0xF1,                 // Seteaza modul de preincarcare la valoarea uzuala (0xF1)/configureaza intervalul de preincarcare al panoului
+        0xDB, 0x40,                 // Configureaza nivelul de descarcare VCOMHa (al panoului la valoarea uzuala (0x40)), comportamentul se verifica pe modelul fizic
+        0xA4,                       // Seteaza modul de afisare normal (nu se ignora continutul memoriei RAM)
+        0xA6,                       // Seteaza modul de afisare normal (nu se inverseaza continutul memoriei RAM)
+        0xAF                        // Display ON /porneste afisarea dupa configurarea parametrilor
     };
 
 
     if (!sendCommands(commands, uint8_t(sizeof commands))) //Trimite secventa de comenzi si verifica rezultatul transferului
     { 
-        return false;                                      //Propaga eroarea I2C deja retinuta de sendCommands
+        return false;       //Propaga eroarea I2C deja retinuta de sendCommands
     } 
-    clear();                                               //Sterge bufferul local de pixeli, fara a transmite inca un cadru separat
-    dirtyPages = 0x0F;                                     //Forteaza trimiterea tuturor celor patru pagini, chiar daca bufferul era deja gol
-    ready = true;                                          //Permite update dupa transmiterea reusita a secventei de configurare
-    return update();                                       //Trimite cadrul initial gol; false inseamna ca nici initializarea completa nu a reusit
+    clear();                //Sterge bufferul local de pixeli, fara a transmite inca un cadru separat
+    dirtyPages = 0x0F;      //Forteaza trimiterea tuturor celor patru pagini, chiar daca bufferul era deja gol
+    ready = true;           //Permite update dupa transmiterea reusita a secventei de configurare
+    return update();        //Trimite cadrul initial gol; false inseamna ca nici initializarea completa nu a reusit
 }
 
 //Metoda 3 - isReady: declarata in Display.h, la acelasi numar
@@ -98,13 +98,13 @@ bool Display::isReady() const       //Defineste citirea starii software a modulu
 }
 
 //metoda 4 - getLastError: declarata in Display.h, la acelasi numar
-EroareDisplay Display::getLastError() const //Defineste metoda declarata in .h; rezultatul este un cod din lista de erori
-{
-    return lastError; //Copiaza ultima eroare catre apelant; nu returneaza un pointer si nu modifica obiectul
+EroareDisplay Display::getLastError() const 
+{                            //Defineste metoda declarata in .h; rezultatul este un cod din lista de erori
+    return lastError;        //Copiaza ultima eroare catre apelant; nu returneaza un pointer si nu modifica obiectul
 }
 
 //metoda 5 - setEnglish: declarata in Display.h, la acelasi numar
 void Display::setEnglish(bool enabled) //Defineste alegerea preferintei vizuale, fara meniu sau persistenta
 {
-    english = enabled; //retine true pentru engleza si false pentru romana; apelantul redeseneaza apoi ecranul dorit
+    english = enabled;                 //retine true pentru engleza si false pentru romana; apelantul redeseneaza apoi ecranul dorit
 }
