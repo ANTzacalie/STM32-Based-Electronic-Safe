@@ -14,12 +14,21 @@ Memorie_RFID::Memorie_RFID()
 uint8_t Memorie_RFID::paginaEsteGoala() const
 {
     // Parcurgem intreaga pagina din 4 in 4 octeti.
-    for (uint32_t offset = 0; offset < DIMENSIUNE_PAGINA; offset += 4)
+    for (uint32_t offset = 0; offset < this->DIMENSIUNE_PAGINA; offset += 4)
     {
         // Obtinem adresa locatiei curente;
-        uint32_t adresa = ADRESA_FLASH + offset;
+        uint32_t adresa = this->ADRESA_FLASH + offset;
 
-        // Citim continutul Flash direct din memorie;
+        /* Citim continutul Flash direct din memorie;
+
+           - reinterpret_cast transforma adresa numerica intrun pointer, * ia valoarea 
+           efectiva, iar volatile indica tipul si regulile de acces la memorie;
+
+           - volatile îi spune compilatorului că accesul la acea locație de memorie trebuie 
+           efectuat efectiv și nu trebuie eliminat sau combinat arbitrar cu alte accesări volatile.
+
+           
+        */
         uint32_t valoare = *reinterpret_cast<volatile const uint32_t*>(adresa);
 
         // O valoare diferita de 0xFFFFFFFF indica date.
