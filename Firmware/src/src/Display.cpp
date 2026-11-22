@@ -150,5 +150,32 @@ void Display::clear() //Defineste stergerea memoriei grafice locale
     }
 } //panoul fizic este actualizat abia prin update
 
+//metoda 8 - drawPixel: declarata in Display.h, la acelasi numar
+void Display::drawPixel(int x, int y, bool on)  //Defineste desenarea/stergerea unui singur pixel in RAM
+{                                               //Deschide verificarea coordonatelor
+    if (x < 0 || x >= 128 || y < 0 || y >= 32)  //Accepta numai coordonate valide pentru panoul 128x32, verifica inclusiv valorile negative inainte de accesarea tabloului
+    {
+        return;                                 //Ignora pixelii care nu pot fi desenati
+    }
+    //const uint16_t index = uint16_t(y / 8) * 128 + uint16_t(x); //Calculeaza indexul octetului din buffer care contine pixelul (x,y)
+    const uint16_t index = uint16_t(x + (y / 8) * 128);         //Calculeaza coloana x din pagina verticala y/8
+    const uint8_t bit = uint8_t(1U << (y % 8));                 //Calculeaza masca bitului corespunzator pixelului din octetul buffer[index]/ selectarea bitului vertical al pixelului in octetul paginii
+    const uint8_t previous = buffer[index];                     //Retine octetul vechi pentru a detecta daca desenul chiar s-a modificat
 
+
+    if (on)                             //Alege aprinderea sau stingerea ceruta de apelant
+    {
+        buffer[index] |= bit;           //Aprinde bitul selectat prin OR, pastrand ceilalti pixeli
+    }
+    else                                //Selecteaza stingerea daca on este false
+    {
+        buffer[index] &= uint8_t(~bit); //Stinge numai bitul selectat prin AND cu masca inversata
+    }
+
+
+    if (previous != buffer[index])            //Verifica daca operatia a schimbat octetul fata de valoarea anterioara
+    {
+        dirtyPages |= uint8_t(1U << (y / 8)); //Marcheaza pagina pixelului pentru urmatorul transfer I2C
+    }
+} 
 
