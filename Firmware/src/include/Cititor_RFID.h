@@ -38,7 +38,7 @@ enum class EroareRFID : uint8_t
     Returneaza:
      1 - Card autorizat.
      0 - Card neautorizat sau eroare.
-  - Adauga un nou card, inlocuindul pe cel vechi in memeorie;
+  - Adauga un nou card, inlocuindul pe cel vechi in memeorie si rescrie KEY_A pe cardul nou;
     
 */
 
