@@ -137,3 +137,18 @@ bool Display::setBrightness(uint8_t level) //Defineste transmiterea unei trepte
     return true;                           //Confirma transmiterea treptei; nu afirma un anumit
 }
 
+//metoda 7 - clear: declarata in Display.h, la acelasi numar
+void Display::clear() //Defineste stergerea memoriei grafice locale
+{
+    for (uint16_t index = 0; index < sizeof buffer; ++index) //Viziteaza exact cei 512 octeti ai framebufferului
+    {
+        if (buffer[index] != 0)                         //Evita marcarea unei pagini daca octetul era deja gol
+        {
+            buffer[index] = 0;                          //Stinge cei opt pixeli reprezentati de acest octet
+            dirtyPages |= uint8_t(1U << (index / 128)); //Marcheaza pagina 0..3 care contine octetul modificat
+        }
+    }
+} //panoul fizic este actualizat abia prin update
+
+
+
