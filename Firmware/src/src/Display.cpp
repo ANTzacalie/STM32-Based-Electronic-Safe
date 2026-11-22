@@ -203,3 +203,76 @@ void Display::drawText(int x, int y, const char* value) // Defineste desenarea u
         } 
     } 
 } 
+
+// METODA 10 - update: declarata in include/Display.h, la acelasi numar.
+bool Display::update() // Defineste transferul paginilor modificate catre OLED.
+{ 
+    if (!ready)                              // Refuza transmiterea inainte de initializare sau dupa un esec de comunicatie.
+    { 
+        return false;                        // Pastreaza diagnosticul anterior si cere apelantului sa trateze problema.
+    } 
+
+
+    for (uint8_t page = 0; page < 4; ++page)          // Parcurge cele patru pagini de cate opt linii ale panoului 128x32.
+    { 
+        const uint8_t pageMask = uint8_t(1U << page); // Construieste bitul care identifica pagina curenta in dirtyPages_.
+        if ((dirtyPages & pageMask) == 0)             // Verifica daca pagina nu a fost atinsa de desenare/stergere.
+        {
+            continue;                                 // Sare direct la pagina urmatoare, economisind trafic I2C.
+        }
+        
+        const uint8_t range[] = {0x21, 0, 127, 0x22, page, page}; // Selecteaza coloanele 0..127 si numai pagina curenta, prin comenzi SSD1306.
+        
+        if (!sendCommands(range, uint8_t(sizeof range))) // Configureaza fereastra de transfer si verifica succesul ei.
+        { 
+            return false; // Nu trimite date fara o fereastra de adresare confirmata de transferul HAL.
+        } 
+
+        uint8_t packet[17] = {}; // Rezerva doar 17 B suplimentari pe stack: prefix plus 16 B de pixeli.
+        packet[0] = 0x40; // Prefixul 0x40 indica date grafice SSD1306, nu comenzi.
+        
+        for (uint8_t offset = 0; offset < 128; offset = uint8_t(offset + 16)) // Parcurge pagina de 128 B in opt pachete de cate 16 B.
+        { 
+            memcpy(packet + 1, buffer + uint16_t(page) * 128 + offset, 16);   // Copiaza cei 16 B din pagina, dupa prefixul de control.
+            if (HAL_I2C_Master_Transmit(&i2c, address, packet, sizeof packet, 10) != HAL_OK) // Transmite sincron pachetul, cu timeout finit de 10 ms.
+            { 
+                ready = false;                                      // Marcheaza comunicatia ca esuata pana la reinitializare.
+                lastError = EroareDisplay::TransferPixeliEsuat;     // Retine esecul transmiterii pixelilor.
+                return false;                                       // Opreste transferurile ramase; nu pretinde ca pagina a fost afisata complet.
+            } 
+        } 
+        dirtyPages &= uint8_t(~pageMask);   // Sterge marcajul paginii numai dupa transmiterea ei completa cu succes.
+    } 
+
+    lastError = EroareDisplay::NicioEroare; // Marcheaza actualizarea reusita, inclusiv cazul fara pagini de transmis.
+    return true;                            // Confirma finalizarea actualizarii; nu exprima starea usii, PIN-ului sau alarmei.
+
+}
+
+// METODA 11 - getBuffer: declarata in include/Display.h, la acelasi numar.
+const uint8_t* Display::getBuffer() const // Defineste accesul la framebuffer pentru verificare vizuala si teste.
+{ 
+    return buffer; // Returneaza un pointer const: apelantul poate inspecta, dar nu modifica pixelii prin acest pointer.
+} 
+
+
+// METODA 12 - showMessage: declarata in include/Display.h, la acelasi numar.
+bool Display::showMessage(const char* title, const char* row2, const char* row3, const char* row4) // Defineste macheta comuna pentru patru randuri.
+{ // Deschide afisarea mesajului.
+    if (!ready) // Cere initializarea reusita inaintea construirii unui ecran de prezentat.
+    { // Deschide cazul OLED-ului indisponibil.
+        return false; // Raporteaza esecul fara promisiunea ca mesajul de eroare ar fi vizibil pe un OLED defect.
+    } // Inchide verificarea disponibilitatii.
+    clear(); // Sterge macheta precedenta din RAM, marcand paginile atinse.
+    drawText(0, 0, title); // Deseneaza titlul pe randul 1, la y=0.
+    drawText(0, 8, row2); // Deseneaza randul 2 la y=8; pointerul nul este ignorat in siguranta.
+    drawText(0, 16, row3); // Deseneaza randul 3 la y=16.
+    drawText(0, 24, row4); // Deseneaza randul 4 la y=24, fara margini care ar consuma o linie.
+    return update(); // Transmite macheta si returneaza rezultatul transportului OLED.
+} // Incheie showMessage.
+
+
+
+
+
+ 

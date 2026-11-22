@@ -16,7 +16,8 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
     DisplayFaraRaspuns,         //Nu s-a primit raspuns de la OLED
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
     ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
-    LuminozitateInvalida        //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
+    LuminozitateInvalida,       //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
+    TransferPixeliEsuat         // HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
                                 
 
 
@@ -56,6 +57,14 @@ class Display
         
         //METODA 10 - drawText: definitia este in src/Display.cpp, la acelasi numar
         void drawText(int x, int y, const char* value);  //deseneaza un text in bufferul local de pixeli; nu trimite inca un cadru separat
+
+        //METODA 11 - getBuffer: definitia este in src/Display.cpp, la acelasi numar
+        const uint8_t* getBuffer() const; // Permite citirea celor 512 B in teste, fara a permite modificarea prin pointerul returnat.
+
+        //METODA 12 - showMessage: definitia este in src/Display.cpp, la acelasi numar
+        bool showMessage(const char* title, const char* row2, const char* row3, const char* row4); // Macheta generica de patru randuri, fiecare limitat vizual la 21 caractere.
+
+
 
 
     private:
