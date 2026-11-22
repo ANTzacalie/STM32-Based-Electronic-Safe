@@ -1,4 +1,5 @@
 #include <Cititor_RFID.h>
+#include <Memorie_RFID.h>
 #include <Safe.h>
 #include <Display.h>
 
@@ -16,12 +17,29 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
+void MEMORIE_RFID_TEST(Memorie_RFID memorieRFID)
+{
+
+    // Verificam daca ultima pagina flash este goala;
+    volatile uint8_t paginaGoala = memorieRFID.paginaEsteGoala();
+
+    // Breakpoint;
+    __NOP();
+
+}
+
 int main(void)
 {
     // Initializam infrastructura HAL.
     HAL_Init();
 
+    Memorie_RFID memorieRFID;
+
+    MEMORIE_RFID_TEST(memorieRFID);
+
     Cititor_RFID cititor_mfrc522;
+
+
 
     while (true)
     {
