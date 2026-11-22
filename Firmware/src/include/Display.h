@@ -17,9 +17,11 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
     ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
     LuminozitateInvalida,       //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
-    TransferPixeliEsuat         // HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
+    TransferPixeliEsuat,        // HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
                                 
 
+    TransferComenziEsuat        // HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
+                                // Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
 
 
 };
@@ -77,7 +79,7 @@ class Display
         bool english = false;                                           //Porneste cu texte in romana; reprezinta doar preferinta vizuala curenta, nu un meniu sau o salvare in Flash
         uint8_t buffer[512] = {};                                       //buffer local de pixeli, 128x32/8=512 octeti; un singur bit pentru fiecare pixel, initial toti pixelii sunt stinsi
         uint8_t fontColumn(char character, uint8_t column) const;       // Returneaza bitii unei coloane de caracter; nu acceseaza hardware.
-
+        
 
 
 };

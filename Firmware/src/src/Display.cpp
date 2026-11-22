@@ -26,7 +26,7 @@ bool Display::begin()
     i2c.Init.DutyCycle = I2C_DUTYCYCLE_2;                   //Completeaza configuratia duty-cycle ceruta de HAL
     i2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;      //Foloseste adrese I2C pe 7 biti pentru dispozitive
     i2c.Init.OwnAddress1 = 0;                               //Nu foloseste adresa proprie a microcontrolerului deorece STM32 este masterul comunicatiei
-    //i2c.Init.DualAddressMode = I2C_DUALADDRESSDISABLE;      //Dezactiveaza a doua adresa proprie, nefolosita de OLED
+    i2c.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;     //Dezactiveaza a doua adresa proprie, nefolosita de OLED
     i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;     //Dezactiveaza raspunsul perifericului la general-call.
     i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;         //Dezactiveaza modul de intindere a semnalului SCL, nefolosit de OLED
 
@@ -275,4 +275,119 @@ bool Display::showMessage(const char* title, const char* row2, const char* row3,
 
 
 
- 
+ static const uint8_t letters_[26][5] = // Defineste tabelul constant al literelor, comun tuturor instantelor clasei.
+{ 
+    {126, 9, 9, 9, 126},        // Defineste cele cinci coloane ale literei A.
+    {127, 73, 73, 73, 54},      // Defineste litera B; numerele sunt masti de pixeli, nu adrese de registre.
+    {62, 65, 65, 65, 34},       // Defineste litera C.
+    {127, 65, 65, 34, 28},      // Defineste litera D.
+    {127, 73, 73, 73, 65},      // Defineste litera E.
+    {127, 9, 9, 9, 1},          // Defineste litera F.
+    {62, 65, 73, 73, 122},      // Defineste litera G.
+    {127, 8, 8, 8, 127},        // Defineste litera H.
+    {0, 65, 127, 65, 0},        // Defineste litera I.
+    {32, 64, 65, 63, 1},        // Defineste litera J.
+    {127, 8, 20, 34, 65},       // Defineste litera K.
+    {127, 64, 64, 64, 64},      // Defineste litera L.
+    {127, 2, 12, 2, 127},       // Defineste litera M.
+    {127, 4, 8, 16, 127},       // Defineste litera N.
+    {62, 65, 65, 65, 62},       // Defineste litera O.
+    {127, 9, 9, 9, 6},          // Defineste litera P.
+    {62, 65, 81, 33, 94},       // Defineste litera Q.
+    {127, 9, 25, 41, 70},       // Defineste litera R.
+    {38, 73, 73, 73, 50},       // Defineste litera S.
+    {1, 1, 127, 1, 1},          // Defineste litera T.
+    {63, 64, 64, 64, 63},       // Defineste litera U.
+    {31, 32, 64, 32, 31},       // Defineste litera V.
+    {63, 64, 56, 64, 63},       // Defineste litera W.
+    {99, 20, 8, 20, 99},        // Defineste litera X.
+    {7, 8, 112, 8, 7},          // Defineste litera Y.
+    {97, 81, 73, 69, 67}        // Defineste litera Z, ultima intrare a tabelului.
+}; 
+
+static const uint8_t digits_[10][5] = // Defineste cele zece cifre in aceeasi organizare de cinci coloane.
+{ 
+    {62, 81, 73, 69, 62},     // Defineste cifra 0.
+    {0, 66, 127, 64, 0},      // Defineste cifra 1.
+    {98, 81, 73, 73, 70},     // Defineste cifra 2.
+    {34, 65, 73, 73, 54},     // Defineste cifra 3.
+    {24, 20, 18, 127, 16},    // Defineste cifra 4.
+    {39, 69, 69, 69, 57},     // Defineste cifra 5.
+    {62, 73, 73, 73, 50},     // Defineste cifra 6.
+    {1, 113, 9, 5, 3},        // Defineste cifra 7.
+    {54, 73, 73, 73, 54},     // Defineste cifra 8.
+    {38, 73, 73, 73, 62}      // Defineste cifra 9.
+}; 
+
+
+uint8_t Display::fontColumn(char character, uint8_t column) const // Defineste obtinerea desenului unei singure coloane de caracter.
+{ 
+    if (column >= 5) // Protejeaza indicii celor cinci coloane disponibile.
+    { 
+        return 0; // Intoarce o coloana goala fara acces in afara tabelelor.
+    } 
+
+    if (character >= 'a' && character <= 'z') // Recunoaste literele mici ASCII.
+    { 
+        character = char(character - 'a' + 'A'); // Refoloseste fontul A..Z, fara un al doilea set de litere.
+    } 
+
+    if (character >= 'A' && character <= 'Z') // Selecteaza tabelul literelor pentru o majuscula valida.
+    { 
+        return letters_[character - 'A'][column]; // Transforma ASCII in indice 0..25 si returneaza masca coloanei.
+    } 
+
+    if (character >= '0' && character <= '9') // Selecteaza tabelul cifrelor.
+    { 
+        return digits_[character - '0'][column]; // Transforma ASCII in indice 0..9 si intoarce masca de pixeli.
+    } 
+
+    switch (character) // Alege semnele de punctuatie folosite de ecrane.
+    { 
+        
+    case '*': // Selecteaza asteriscul folosit la mascarea PIN-ului.
+    { 
+        const uint8_t shape[] = {20, 8, 62, 8, 20}; // Memoreaza cele cinci coloane ale asteriscului.
+        return shape[column]; // Intoarce coloana ceruta, nu o cifra din PIN.
+    } 
+    case '_': // Selecteaza cursorul de introducere.
+        return 64; // Aprinde bitul 6 pe fiecare coloana, formand linia de jos.
+    case '-': // Selecteaza minusul sau marcajul unei valori necunoscute.
+        return 8; // Aprinde bitul 3, formand linia de la mijloc.
+    case ':': // Selecteaza separatorul dintre ore/minute sau eticheta/valoare.
+        return column == 2 ? 36 : 0; // Aprinde doua puncte numai in coloana centrala.
+    case '.': // Selecteaza punctul folosit in meniuri si mesaje.
+        return column == 2 ? 64 : 0; // Aprinde un singur pixel de jos in coloana centrala.
+    case '/': // Selecteaza separatorul datei sau al alternativelor din meniu.
+        return uint8_t(64U >> column); // Deplaseaza cate un bit pentru a forma o diagonala.
+    case '#': // Selecteaza simbolul tastei pentru contrast, folosit numai ca eticheta.
+        return column % 2 ? 127 : 20; // Alterneaza coloanele pline si cele doua linii transversale.
+    case '?': // Selecteaza marcajul unei informatii necunoscute, inclusiv bateria.
+    { 
+        const uint8_t shape[] = {2, 1, 81, 9, 6}; // Defineste cele cinci coloane ale simbolului.
+        return shape[column];                     // Intoarce coloana semnului de intrebare.
+    } 
+    default: // Trateaza spatiul si orice caracter nesuportat de fontul ASCII compact.
+        return 0; // Deseneaza o coloana goala; nu interpreteaza secvente UTF-8 ca indici de tabel.
+    } 
+} 
+
+// Trimite comenzile de configurare pe I2C.
+bool Display::sendCommands(const uint8_t* commands, uint8_t length) // Defineste transportul comenzilor si parametrilor SSD1306.
+{ 
+    if (commands == nullptr || length > 31) // Protejeaza pointerul sursa si capacitatea pachetului de 32 B.
+    { 
+        lastError = EroareDisplay::ComenziInvalide; // Memoreaza eroarea parametrilor pachetului de comenzi.
+        return false; // Nu efectueaza nicio transmisie pentru date invalide.
+    } 
+
+    uint8_t packet[32] = {}; // Rezerva pachetul pe stack; primul octet zero indica transmisie de comenzi.
+    memcpy(packet + 1, commands, length); // Copiaza comenzile dupa octetul de control 0x00.
+    if (HAL_I2C_Master_Transmit(&i2c, address, packet, uint16_t(length + 1), 10) != HAL_OK) // Transmite sincron cu timeout de 10 ms.
+    { 
+        ready = false; // Retrage confirmarea de functionare pana la o reinitializare ceruta de apelant.
+        lastError = EroareDisplay::TransferComenziEsuat; // Retine esecul transmiterii comenzilor.
+        return false; // Opreste operatia curenta la primul transfer esuat.
+    } 
+    return true; // Confirma doar transmiterea comenzilor, fara o autentificare sau decizie despre seif.
+} 

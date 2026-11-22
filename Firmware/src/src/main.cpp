@@ -28,6 +28,27 @@ void MEMORIE_RFID_TEST(Memorie_RFID memorieRFID)
 
 }
 
+/////////////////////// DISPLAY OLED ///////////////////////
+
+// In debugger poti vedea rezultatul testului in aceasta variabila.
+volatile EroareDisplay eroareTest = EroareDisplay::Neinitializat;
+
+void DISPLAY_OLED_INIT()
+{
+    // Constructorul pregateste obiectul. begin() initializeaza I2C si OLED-ul.
+    Display display;
+
+    if (display.begin() && display.setBrightness(1))
+    {
+        // Fiecare argument apare pe un rand separat al ecranului.
+        display.showMessage("TEST OLED", "STM32F103", "I2C OK", "DISPLAY PORNIT");
+    }
+
+    eroareTest = display.getLastError();
+}
+
+/////////////////////// DISPLAY OLED ///////////////////////
+
 int main(void)
 {
     // Initializam infrastructura HAL.
@@ -39,7 +60,7 @@ int main(void)
 
     Cititor_RFID cititor_mfrc522;
 
-
+    DISPLAY_OLED_INIT();
 
     while (true)
     {
