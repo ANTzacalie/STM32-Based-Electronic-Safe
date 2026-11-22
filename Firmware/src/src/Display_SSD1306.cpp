@@ -256,6 +256,11 @@ const uint8_t* Display::getBuffer() const // Defineste accesul la framebuffer pe
 } 
 
 
+/*
+
+   $$$ PROBLEMA DE COMUNICATIE ATUNCI CAND SURSA DE TENSIUNE ESTE INCHISA SI REDESCHISA, ECRANUL NU SE MAI APRINDE;
+
+*/
 // METODA 12 - showMessage: declarata in include/Display.h, la acelasi numar.
 bool Display::showMessage(const char* title, const char* row2, const char* row3, const char* row4) // Defineste macheta comuna pentru patru randuri.
 { // Deschide afisarea mesajului.

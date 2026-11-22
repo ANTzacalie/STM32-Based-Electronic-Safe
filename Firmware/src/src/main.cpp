@@ -1,7 +1,7 @@
 #include <Cititor_RFID.h>
 #include <Memorie_RFID.h>
 #include <Safe.h>
-#include <Display.h>
+#include <Display_SSD1306.h>
 
 #include "stm32f1xx_hal.h"
 /*
@@ -64,7 +64,7 @@ int main(void)
 
     while (true)
     {
-        /* code */
+        HAL_Delay(100);
     }
     
 
