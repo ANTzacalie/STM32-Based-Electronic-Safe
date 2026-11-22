@@ -60,6 +60,7 @@ class Display
         bool ready = false; //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
         EroareDisplay lastError = EroareDisplay::Neinitializat; //ultima eroare de comunicatie sau de parametrii primiti de metodele de afisare
         bool sendCommands(const uint8_t* commands, uint8_t length); //trimite comenzi SSD1306 si returneaza succesul transferului (cel mult 31 de comenzi/parametrii SSD1306 cu prefixul de control 0x00)
+        bool english = false; //Porneste cu texte in romana; reprezinta doar preferinta vizuala curenta, nu un meniu sau o salvare in Flash
 
 };
 

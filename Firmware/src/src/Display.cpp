@@ -103,4 +103,8 @@ EroareDisplay Display::getLastError() const //Defineste metoda declarata in .h; 
     return lastError; //Copiaza ultima eroare catre apelant; nu returneaza un pointer si nu modifica obiectul
 }
 
-
+//metoda 5 - setEnglish: declarata in Display.h, la acelasi numar
+void Display::setEnglish(bool enabled) //Defineste alegerea preferintei vizuale, fara meniu sau persistenta
+{
+    english = enabled; //retine true pentru engleza si false pentru romana; apelantul redeseneaza apoi ecranul dorit
+}
