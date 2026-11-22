@@ -1,6 +1,6 @@
 
 // Mario, include path la Display.h , il tot stergi, cum vede clasa unde implementezi metodele?
-#include "Display.h"
+#include "Display_SSD1306.h"
 #include <string.h>
 
 //Metoda 1 - Display: declarata in Display.h, la acelasi numar
