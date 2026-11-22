@@ -21,15 +21,14 @@ extern "C" void SysTick_Handler(void)
 void MFRC522_RFID_INIT()
 {
      
-    // Constructorul initializeaza GPIO, SPI si antena.
+    // Constructorul initializeaza GPIO, SPI si antena pentru MFRC522;
     Cititor_RFID cititor_mfrc522;
 
     // Permitem stabilizarea modulului RFID.
     HAL_Delay(100);
 
-    //verificam rezultatele complete;
-    __NOP();
-    HAL_Delay(100);
+    // 
+
     
     
 } // TEST
