@@ -256,6 +256,21 @@ const uint8_t* Display::getBuffer() const // Defineste accesul la framebuffer pe
 } 
 
 
+// METODA 12 - showMessage: declarata in include/Display.h, la acelasi numar.
+bool Display::showMessage(const char* title, const char* row2, const char* row3, const char* row4) // Defineste macheta comuna pentru patru randuri.
+{ // Deschide afisarea mesajului.
+    if (!ready) // Cere initializarea reusita inaintea construirii unui ecran de prezentat.
+    { // Deschide cazul OLED-ului indisponibil.
+        return false; // Raporteaza esecul fara promisiunea ca mesajul de eroare ar fi vizibil pe un OLED defect.
+    } // Inchide verificarea disponibilitatii.
+    clear(); // Sterge macheta precedenta din RAM, marcand paginile atinse.
+    drawText(0, 0, title); // Deseneaza titlul pe randul 1, la y=0.
+    drawText(0, 8, row2); // Deseneaza randul 2 la y=8; pointerul nul este ignorat in siguranta.
+    drawText(0, 16, row3); // Deseneaza randul 3 la y=16.
+    drawText(0, 24, row4); // Deseneaza randul 4 la y=24, fara margini care ar consuma o linie.
+    return update(); // Transmite macheta si returneaza rezultatul transportului OLED.
+} // Incheie showMessage.
+
 
 
 
