@@ -16,7 +16,8 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
     DisplayFaraRaspuns,         //Nu s-a primit raspuns de la OLED
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
     ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
-    LuminozitateInvalida        //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
+    LuminozitateInvalida,       //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
+    TransferPixeliEsuat         // HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
                                 
 
 
