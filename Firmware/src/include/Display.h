@@ -15,7 +15,11 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
                                 //Verificare configurare I2C1 si a pinilor PB6/PB7, acest cod nu spune singur cauza exacta
     DisplayFaraRaspuns,         //Nu s-a primit raspuns de la OLED
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
-    ComenziInvalide             //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
+    ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
+    LuminozitateInvalida        //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
+                                
+
+
 
 };
 

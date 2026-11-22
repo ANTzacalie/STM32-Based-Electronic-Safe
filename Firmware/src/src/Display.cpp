@@ -108,3 +108,32 @@ void Display::setEnglish(bool enabled) //Defineste alegerea preferintei vizuale,
 {
     english = enabled;                 //retine true pentru engleza si false pentru romana; apelantul redeseneaza apoi ecranul dorit
 }
+
+//metoda 6 - setBrightness: declarata in Display.h, la acelasi numar
+bool Display::setBrightness(uint8_t level) //Defineste transmiterea unei trepte
+{
+    if (level > 2) //Accepta numai 0=minim, 1=mediu si 2=maxim
+    {
+        lastError = EroareDisplay::LuminozitateInvalida; //Retine eroarea de nivel primit, fara comenzi fizice gresite
+        return false;                                    //Nu modifica display-ul pentru un nivel invalid
+    }
+   
+
+    if (!ready)       //Cere initializarea reusita inaintea modificarii contrastului
+    {
+        return false; //Pastreaza diagnosticul de initializare/comunicatie deja existent
+    }
+
+
+    const uint8_t levels[] = {0x01, 0x70, 0xFF};      //Defineste cele trei valori de contrast, fara reguli despre # sau standby
+    const uint8_t commands[] = {0x81, levels[level]}; //Pregateste comanda SSD1306 de contrast si valoarea selectata
+    
+
+    if (!sendCommands(commands, uint8_t(sizeof commands))) //Trimite schimbarea contrastului si verifica HAL
+    {
+        return false;           //Propaga esecul catre apelant, care va decide recuperarea
+    }
+    lastError = EroareDisplay::NicioEroare; //Marcheaza comanda de contrast ca reusita
+    return true;                           //Confirma transmiterea treptei; nu afirma un anumit
+}
+
