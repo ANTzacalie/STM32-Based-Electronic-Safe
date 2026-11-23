@@ -390,6 +390,21 @@ bool Display::showPin(uint8_t digitCount, uint8_t attemptsLeft, bool cursorVisib
 } 
 
 
+// METODA 15 - showPinIncorrect: declarata in include/Display.h, la acelasi numar.
+bool Display::showPinIncorrect(uint8_t attemptsLeft) // Defineste mesajul PIN incorect cu incercari furnizate de logica viitoare.
+{ 
+    if (attemptsLeft > 3) // Respinge un numar care nu corespunde machetei cu maximum trei incercari.
+    { 
+        lastError = EroareDisplay::IncercariInvalide; // Memoreaza eroarea valorii de incercari primite pentru afisare.
+        return false; // Nu schimba imaginea si nu modifica vreun istoric de autentificare.
+    } 
+    char attempts[22] = {}; // Pregateste textul temporar al incercarilor, fara alocare dinamica.
+    snprintf(attempts, sizeof attempts, "%s: %u", text("INCERCARI", "ATTEMPTS"), unsigned(attemptsLeft)); // Construieste eticheta si valoarea exact asa cum au fost furnizate.
+    return showMessage(text("COD INCORECT", "WRONG PIN"), attempts, text("REINCERCATI", "TRY AGAIN"), ""); // Foloseste macheta comuna si propaga rezultatul transmisiei.
+} 
+
+
+
 
 
 

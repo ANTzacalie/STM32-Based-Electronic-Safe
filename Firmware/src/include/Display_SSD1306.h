@@ -17,11 +17,12 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
     ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
     LuminozitateInvalida,       //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
-    TransferPixeliEsuat,        // HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
-    DatePinInvalide,            // showPin a primit mai mult de 12 cifre de desenat sau mai mult de 3 incercari de afisat.                            
+    TransferPixeliEsuat,        //HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
+    DatePinInvalide,            //showPin a primit mai mult de 12 cifre de desenat sau mai mult de 3 incercari de afisat.   
+    IncercariInvalide,          //showPinIncorrect a primit mai mult de 3 incercari ramase pentru mesajul de pe ecran.                         
 
-    TransferComenziEsuat        // HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
-                                // Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
+    TransferComenziEsuat        //HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
+                                //Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
 
 
 };
@@ -74,6 +75,8 @@ class Display
         // METODA 14 - showPin: definitia este in src/Display.cpp, la acelasi numar.
         bool showPin(uint8_t digitCount, uint8_t attemptsLeft, bool cursorVisible); // Afiseaza numai numarul de asteriscuri, incercarile si faza cursorului primite din exterior.
 
+        // METODA 15 - showPinIncorrect: definitia este in src/Display.cpp, la acelasi numar.
+        bool showPinIncorrect(uint8_t attemptsLeft); // Afiseaza mesajul de cod gresit si valoarea primita, fara decrementarea vreunui contor.
 
     private:
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
