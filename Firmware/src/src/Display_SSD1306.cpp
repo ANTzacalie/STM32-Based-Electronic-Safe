@@ -355,20 +355,26 @@ bool Display::showPin(uint8_t digitCount, uint8_t attemptsLeft, bool cursorVisib
     { 
         lastError = EroareDisplay::DatePinInvalide; // Retine codul parametrilor vizuali PIN invalizi.
         return false; // Pastreaza vechea imagine si nu acceseaza bufferul cu un indice invalid.
-    } // Inchide verificarea parametrilor.
-    if (!ready) // Cere initializarea reusita a OLED-ului.
-    { // Deschide cazul indisponibilitatii.
+    } 
+
+
+    if (!ready)       // Cere initializarea reusita a OLED-ului.
+    { 
         return false; // Raporteaza esecul fara sa consume o incercare PIN.
-    } // Inchide verificarea starii.
-    clear(); // Sterge imaginea anterioara in RAM.
+    } 
+
+
+    clear();          // Sterge imaginea anterioara in RAM.
     drawText(0, 0, text("INTRODUCETI CODUL", "ENTER PIN")); // Deseneaza titlul introducerii PIN-ului.
     drawMaskedPin(digitCount, cursorVisible); // Deseneaza numai lungimea si faza cursorului furnizate de apelant.
+    
     char attempts[22] = {}; // Rezerva un rand de maximum 21 caractere plus terminator.
     snprintf(attempts, sizeof attempts, "%s: %u", text("INCERCARI", "ATTEMPTS"), unsigned(attemptsLeft)); // Formateaza valoarea primita, fara decrementare sau resetare.
     drawText(0, 16, attempts); // Afiseaza incercarile pe al treilea rand.
     drawText(0, 24, text("*:STERGE #:LUMINA", "*:DELETE #:BRIGHT")); // Deseneaza doar etichetele tastelor; nu proceseaza apasarile lor.
+    
     return update(); // Transmite macheta si returneaza rezultatul comunicatiei.
-} // Incheie showPin.
+} 
 
 
 
