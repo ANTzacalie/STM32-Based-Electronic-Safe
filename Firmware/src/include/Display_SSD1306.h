@@ -66,6 +66,8 @@ class Display
         //METODA 12 - showMessage: definitia este in src/Display.cpp, la acelasi numar
         bool showMessage(const char* title, const char* row2, const char* row3, const char* row4); // Macheta generica de patru randuri, fiecare limitat vizual la 21 caractere.
 
+            // METODA 13 - showHome: definitia este in src/Display.cpp, la acelasi numar.
+        bool showHome(const char* status, const char* timeText, const char* dateText, bool batteryValid, uint8_t batteryPercent); // Afiseaza starea si ora/data primite; nu le calculeaza si nu confirma usa.
 
 
 
@@ -80,6 +82,10 @@ class Display
         uint8_t buffer[512] = {};                                       //buffer local de pixeli, 128x32/8=512 octeti; un singur bit pentru fiecare pixel, initial toti pixelii sunt stinsi
         uint8_t fontColumn(char character, uint8_t column) const;       // Returneaza bitii unei coloane de caracter; nu acceseaza hardware.
         
+        // METODA  - drawBattery: definitia este in src/Display.cpp, la acelasi numar.
+        void drawBattery(bool valid, uint8_t percent); // Deseneaza pictograma din datele primite; procent invalid inseamna semnul intrebarii.
+        
+        const char* text(const char* romanian, const char* english) const; // Alege una dintre doua etichete constante dupa preferinta vizuala.
 
 
 };

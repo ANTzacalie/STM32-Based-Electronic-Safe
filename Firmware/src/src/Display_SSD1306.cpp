@@ -2,6 +2,7 @@
 // Mario, include path la Display.h , il tot stergi, cum vede clasa unde implementezi metodele?
 #include "Display_SSD1306.h"
 #include <string.h>
+#include <stdio.h> // Include snprintf pentru formatarea textelor cu limita de dimensiune.
 
 // TABELELE FONTULUI: definite o singura data, dupa declaratiile lor din clasa.
 // Font monocrom 5x7: un grup are cinci coloane, iar bitii 0..6 ai fiecarei coloane indica pixelii de sus in jos.
@@ -326,7 +327,26 @@ bool Display::showMessage(const char* title, const char* row2, const char* row3,
 } // Incheie showMessage.
 
 
-
+// METODA 13 - showHome: declarata in include/Display.h, la acelasi numar.
+bool Display::showHome(const char* status, const char* timeText, const char* dateText, bool batteryValid, uint8_t batteryPercent) // Defineste ecranul general din informatii deja pregatite de apelant.
+{ 
+    if (!ready)       // Verifica disponibilitatea software a OLED-ului.
+    { 
+        return false; // Lasa tratarea defectului la apelant, fara a confirma vreo stare a seifului.
+    } 
+    clear();          // Curata imaginea precedenta in RAM.
+    char title[19] = {};   // Rezerva maximum 18 caractere plus terminator, lasand loc pictogramei bateriei pe primul rand.
+    if (status != nullptr) // Verifica existenta textului de stare primit din exterior.
+    { 
+        snprintf(title, sizeof title, "%s", status); // Copiaza cel mult cat incape in titlu; textul mai lung este trunchiat sigur.
+    } 
+    drawText(0, 0, title);      // Deseneaza exact starea transmisa de logica viitoare, fara a o deduce din PIN/card.
+    drawBattery(batteryValid, batteryPercent); // Deseneaza bateria pe baza datelor modulului de alimentare.
+    drawText(0, 8, timeText);   // Afiseaza ora primita ca text; nu o calculeaza si nu o pastreaza ca RTC.
+    drawText(0, 16, dateText);  // Afiseaza data primita ca text, fara validare calendaristica.
+    drawText(0, 24, text("INTRODU COD / CARD", "ENTER PIN / USE CARD")); // Deseneaza instructiunea de acces in limba selectata.
+    return update();            // Transmite ecranul si raporteaza succesul afisarii.
+} 
 
 
 
