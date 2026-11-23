@@ -1,0 +1,74 @@
+Teste Display
+
+
+
+Test 1 22.11.2026
+
+/////////////////////// DISPLAY OLED ///////////////////////
+
+// In debugger poti vedea rezultatul testului in aceasta variabila.
+volatile EroareDisplay eroareTest = EroareDisplay::Neinitializat;
+
+void DISPLAY_OLED_INIT()
+{
+    // Constructorul pregateste obiectul. begin() initializeaza I2C si OLED-ul.
+    Display display;
+
+    if (display.begin() && display.setBrightness(1))
+    {
+        // Fiecare argument apare pe un rand separat al ecranului.
+        display.showMessage("TEST OLED", "STM32F103", "I2C OK", "DISPLAY PORNIT");
+    }
+
+    eroareTest = display.getLastError();
+}
+
+/////////////////////// DISPLAY OLED ///////////////////////
+
+
+
+Test 2 23.11.2026
+
+/////////////////////// DISPLAY OLED ///////////////////////
+
+volatile EroareDisplay eroareTest = EroareDisplay::Neinitializat; // Rezultatul vizibil in debugger.
+static Display display;          // Acelasi obiect si acelasi buffer sunt folosite de ambele functii.
+static uint32_t ultimaIncercare; // Momentul ultimei incercari, in milisecunde de la pornire.
+
+void DISPLAY_OLED_INIT()         // Se apeleaza la pornire si dupa o pierdere de comunicatie.
+{
+    ultimaIncercare = HAL_GetTick();  // Retine momentul la care incepe incercarea.
+
+    if (display.begin() && display.setBrightness(1)) // Detecteaza OLED-ul, apoi seteaza contrastul mediu.
+    {
+        display.showMessage("TEST OLED", "STM32F103", "I2C OK", "DISPLAY PORNIT"); // Afiseaza 4 randuri.
+    }
+
+    eroareTest = display.getLastError(); // Salveaza rezultatul ultimei operatii pentru debugger.
+}
+
+void DISPLAY_OLED_SERVICE()      // Se apeleaza repetat din bucla principala a seifului.
+{
+    if (HAL_GetTick() - ultimaIncercare < 1000U) // Verifica daca a trecut o secunda de la ultima incercare.
+    {
+        return;                  // Este prea devreme. Programul continua imediat cu restul seifului.
+    }
+
+    ultimaIncercare = HAL_GetTick(); // Memoreaza momentul verificarii curente.
+
+    if (!display.isReady())      // Consulta starea memorata de driver dupa ultima comunicatie.
+    {
+        DISPLAY_OLED_INIT();     // Reincearca detectarea adresei si initializarea OLED-ului.
+        return;                  // Initializarea tocmai a incercat sa trimita si imaginea.
+    }
+
+    display.refreshPanel();               // Reaplica setarile si imaginea daca OLED-ul a repornit separat.
+    eroareTest = display.getLastError();  // Pastreaza rezultatul. La esec, driverul va cere reinitializare.
+}
+
+
+int main(void)
+
+DISPLAY_OLED_INIT();
+ DISPLAY_OLED_SERVICE();    // Verifica daca a trecut o secunda si comunica cu OLED-ul.
+/////////////////////// DISPLAY OLED ///////////////////////
