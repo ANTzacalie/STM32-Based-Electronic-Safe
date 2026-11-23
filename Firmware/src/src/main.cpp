@@ -38,14 +38,10 @@ int main(void)
     Memorie_RFID memorieRFID;
     Cititor_RFID cititor_mfrc522;
 
-    MEMORIE_RFID_TEST(memorieRFID);
-
-
-    
 
     while (true)
     {
-       
+        MEMORIE_RFID_TEST(memorieRFID);
         HAL_Delay(100);
     }
     
