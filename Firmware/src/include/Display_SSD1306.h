@@ -18,7 +18,7 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
     ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
     LuminozitateInvalida,       //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
     TransferPixeliEsuat,        // HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
-                                
+    DatePinInvalide,            // showPin a primit mai mult de 12 cifre de desenat sau mai mult de 3 incercari de afisat.                            
 
     TransferComenziEsuat        // HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
                                 // Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
@@ -66,9 +66,11 @@ class Display
         //METODA 12 - showMessage: definitia este in src/Display.cpp, la acelasi numar
         bool showMessage(const char* title, const char* row2, const char* row3, const char* row4); // Macheta generica de patru randuri, fiecare limitat vizual la 21 caractere.
 
-            // METODA 13 - showHome: definitia este in src/Display.cpp, la acelasi numar.
+        // METODA 13 - showHome: definitia este in src/Display.cpp, la acelasi numar.
         bool showHome(const char* status, const char* timeText, const char* dateText, bool batteryValid, uint8_t batteryPercent); // Afiseaza starea si ora/data primite; nu le calculeaza si nu confirma usa.
 
+        // METODA 14 - showPin: definitia este in src/Display.cpp, la acelasi numar.
+        bool showPin(uint8_t digitCount, uint8_t attemptsLeft, bool cursorVisible); // Afiseaza numai numarul de asteriscuri, incercarile si faza cursorului primite din exterior.
 
 
     private:
@@ -84,6 +86,9 @@ class Display
         
         // METODA  - drawBattery: definitia este in src/Display.cpp, la acelasi numar.
         void drawBattery(bool valid, uint8_t percent); // Deseneaza pictograma din datele primite; procent invalid inseamna semnul intrebarii.
+
+        // METODA  - drawMaskedPin: definitia este in src/Display.cpp, la acelasi numar.
+        void drawMaskedPin(uint8_t digitCount, bool cursorVisible); // Deseneaza asteriscuri si cursor din lungime, fara sa primeasca PIN-ul real.
         
         const char* text(const char* romanian, const char* english) const; // Alege una dintre doua etichete constante dupa preferinta vizuala.
 
