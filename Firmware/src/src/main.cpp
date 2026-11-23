@@ -11,7 +11,7 @@
  - daca nu lam declara, HAL_Delay poate sa nu se mai termine niciodata
  
  - extern "C" permite identificarea corecta a functiei de catre codul startup.
- */
+*/
 extern "C" void SysTick_Handler(void)
 {
     HAL_IncTick();
@@ -73,10 +73,10 @@ int main(void)
     HAL_Init();
 
     Memorie_RFID memorieRFID;
+    Cititor_RFID cititor_mfrc522;
 
     MEMORIE_RFID_TEST(memorieRFID);
 
-    Cititor_RFID cititor_mfrc522;
 
     DISPLAY_OLED_INIT();
 
