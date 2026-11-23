@@ -3,6 +3,55 @@
 #include "Display_SSD1306.h"
 #include <string.h>
 
+// TABELELE FONTULUI: definite o singura data, dupa declaratiile lor din clasa.
+// Font monocrom 5x7: un grup are cinci coloane, iar bitii 0..6 ai fiecarei coloane indica pixelii de sus in jos.
+const uint8_t letters[26][5] = // Defineste tabelul constant al literelor, comun tuturor instantelor clasei.
+{ 
+    {126, 9, 9, 9, 126},        // Defineste cele cinci coloane ale literei A.
+    {127, 73, 73, 73, 54},      // Defineste litera B; numerele sunt masti de pixeli, nu adrese de registre.
+    {62, 65, 65, 65, 34},       // Defineste litera C.
+    {127, 65, 65, 34, 28},      // Defineste litera D.
+    {127, 73, 73, 73, 65},      // Defineste litera E.
+    {127, 9, 9, 9, 1},          // Defineste litera F.
+    {62, 65, 73, 73, 122},      // Defineste litera G.
+    {127, 8, 8, 8, 127},        // Defineste litera H.
+    {0, 65, 127, 65, 0},        // Defineste litera I.
+    {32, 64, 65, 63, 1},        // Defineste litera J.
+    {127, 8, 20, 34, 65},       // Defineste litera K.
+    {127, 64, 64, 64, 64},      // Defineste litera L.
+    {127, 2, 12, 2, 127},       // Defineste litera M.
+    {127, 4, 8, 16, 127},       // Defineste litera N.
+    {62, 65, 65, 65, 62},       // Defineste litera O.
+    {127, 9, 9, 9, 6},          // Defineste litera P.
+    {62, 65, 81, 33, 94},       // Defineste litera Q.
+    {127, 9, 25, 41, 70},       // Defineste litera R.
+    {38, 73, 73, 73, 50},       // Defineste litera S.
+    {1, 1, 127, 1, 1},          // Defineste litera T.
+    {63, 64, 64, 64, 63},       // Defineste litera U.
+    {31, 32, 64, 32, 31},       // Defineste litera V.
+    {63, 64, 56, 64, 63},       // Defineste litera W.
+    {99, 20, 8, 20, 99},        // Defineste litera X.
+    {7, 8, 112, 8, 7},          // Defineste litera Y.
+    {97, 81, 73, 69, 67}        // Defineste litera Z, ultima intrare a tabelului.
+}; 
+
+static const uint8_t digits[10][5] = // Defineste cele zece cifre in aceeasi organizare de cinci coloane.
+{ 
+    {62, 81, 73, 69, 62},     // Defineste cifra 0.
+    {0, 66, 127, 64, 0},      // Defineste cifra 1.
+    {98, 81, 73, 73, 70},     // Defineste cifra 2.
+    {34, 65, 73, 73, 54},     // Defineste cifra 3.
+    {24, 20, 18, 127, 16},    // Defineste cifra 4.
+    {39, 69, 69, 69, 57},     // Defineste cifra 5.
+    {62, 73, 73, 73, 50},     // Defineste cifra 6.
+    {1, 113, 9, 5, 3},        // Defineste cifra 7.
+    {54, 73, 73, 73, 54},     // Defineste cifra 8.
+    {38, 73, 73, 73, 62}      // Defineste cifra 9.
+}; 
+
+
+
+
 //Metoda 1 - Display: declarata in Display.h, la acelasi numar
 Display::Display()
 {
@@ -280,49 +329,7 @@ bool Display::showMessage(const char* title, const char* row2, const char* row3,
 
 
 
- static const uint8_t letters_[26][5] = // Defineste tabelul constant al literelor, comun tuturor instantelor clasei.
-{ 
-    {126, 9, 9, 9, 126},        // Defineste cele cinci coloane ale literei A.
-    {127, 73, 73, 73, 54},      // Defineste litera B; numerele sunt masti de pixeli, nu adrese de registre.
-    {62, 65, 65, 65, 34},       // Defineste litera C.
-    {127, 65, 65, 34, 28},      // Defineste litera D.
-    {127, 73, 73, 73, 65},      // Defineste litera E.
-    {127, 9, 9, 9, 1},          // Defineste litera F.
-    {62, 65, 73, 73, 122},      // Defineste litera G.
-    {127, 8, 8, 8, 127},        // Defineste litera H.
-    {0, 65, 127, 65, 0},        // Defineste litera I.
-    {32, 64, 65, 63, 1},        // Defineste litera J.
-    {127, 8, 20, 34, 65},       // Defineste litera K.
-    {127, 64, 64, 64, 64},      // Defineste litera L.
-    {127, 2, 12, 2, 127},       // Defineste litera M.
-    {127, 4, 8, 16, 127},       // Defineste litera N.
-    {62, 65, 65, 65, 62},       // Defineste litera O.
-    {127, 9, 9, 9, 6},          // Defineste litera P.
-    {62, 65, 81, 33, 94},       // Defineste litera Q.
-    {127, 9, 25, 41, 70},       // Defineste litera R.
-    {38, 73, 73, 73, 50},       // Defineste litera S.
-    {1, 1, 127, 1, 1},          // Defineste litera T.
-    {63, 64, 64, 64, 63},       // Defineste litera U.
-    {31, 32, 64, 32, 31},       // Defineste litera V.
-    {63, 64, 56, 64, 63},       // Defineste litera W.
-    {99, 20, 8, 20, 99},        // Defineste litera X.
-    {7, 8, 112, 8, 7},          // Defineste litera Y.
-    {97, 81, 73, 69, 67}        // Defineste litera Z, ultima intrare a tabelului.
-}; 
-
-static const uint8_t digits_[10][5] = // Defineste cele zece cifre in aceeasi organizare de cinci coloane.
-{ 
-    {62, 81, 73, 69, 62},     // Defineste cifra 0.
-    {0, 66, 127, 64, 0},      // Defineste cifra 1.
-    {98, 81, 73, 73, 70},     // Defineste cifra 2.
-    {34, 65, 73, 73, 54},     // Defineste cifra 3.
-    {24, 20, 18, 127, 16},    // Defineste cifra 4.
-    {39, 69, 69, 69, 57},     // Defineste cifra 5.
-    {62, 73, 73, 73, 50},     // Defineste cifra 6.
-    {1, 113, 9, 5, 3},        // Defineste cifra 7.
-    {54, 73, 73, 73, 54},     // Defineste cifra 8.
-    {38, 73, 73, 73, 62}      // Defineste cifra 9.
-}; 
+ 
 
 
 uint8_t Display::fontColumn(char character, uint8_t column) const // Defineste obtinerea desenului unei singure coloane de caracter.
@@ -339,12 +346,12 @@ uint8_t Display::fontColumn(char character, uint8_t column) const // Defineste o
 
     if (character >= 'A' && character <= 'Z') // Selecteaza tabelul literelor pentru o majuscula valida.
     { 
-        return letters_[character - 'A'][column]; // Transforma ASCII in indice 0..25 si returneaza masca coloanei.
+        return letters[character - 'A'][column]; // Transforma ASCII in indice 0..25 si returneaza masca coloanei.
     } 
 
     if (character >= '0' && character <= '9') // Selecteaza tabelul cifrelor.
     { 
-        return digits_[character - '0'][column]; // Transforma ASCII in indice 0..9 si intoarce masca de pixeli.
+        return digits[character - '0'][column]; // Transforma ASCII in indice 0..9 si intoarce masca de pixeli.
     } 
 
     switch (character) // Alege semnele de punctuatie folosite de ecrane.
