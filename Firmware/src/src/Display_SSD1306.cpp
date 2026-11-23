@@ -329,7 +329,9 @@ bool Display::showMessage(const char* title, const char* row2, const char* row3,
 
 
 
- 
+
+
+
 
 
 uint8_t Display::fontColumn(char character, uint8_t column) const // Defineste obtinerea desenului unei singure coloane de caracter.
