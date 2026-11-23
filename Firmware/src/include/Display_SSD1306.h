@@ -36,6 +36,8 @@ class Display
         //METODA 02 - begin: definitia este in src/Display.cpp, la acelasi numar
         bool begin();   // configurare PB6/PB7 si I2C prin HAL, detectare OLED si trimitere initilizare in SSD1306
 
+        bool refreshPanel();  // Retrimite configuratia OLED si imaginea pastrata in memoria STM32.
+
         //METODA 03 - isReady: definitia este in src/Display.cpp, la acelasi numar
         bool isReady() const;  //returnare initializarea/ultimul transfer a reusit, fara o verificare electronica
 
@@ -77,6 +79,7 @@ class Display
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
         uint16_t address = 0;                                           //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
         uint8_t dirtyPages = 0;                                         //Ceii patru biti inferiori indica paginile de cate 8 linii care trebuie retransmise
+        uint8_t contrast = 0x01;                                        // Porneste la contrast minim si retine apoi ultima valoare trimisa cu succes.
         bool ready = false;                                             //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
         EroareDisplay lastError = EroareDisplay::Neinitializat;         //ultima eroare de comunicatie sau de parametrii primiti de metodele de afisare
         bool sendCommands(const uint8_t* commands, uint8_t length);     //trimite comenzi SSD1306 si returneaza succesul transferului (cel mult 31 de comenzi/parametrii SSD1306 cu prefixul de control 0x00)
