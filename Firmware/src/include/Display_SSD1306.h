@@ -78,6 +78,10 @@ class Display
         // METODA 15 - showPinIncorrect: definitia este in src/Display.cpp, la acelasi numar.
         bool showPinIncorrect(uint8_t attemptsLeft); // Afiseaza mesajul de cod gresit si valoarea primita, fara decrementarea vreunui contor.
 
+        // METODA 16 - showPinCorrect: definitia este in src/Display.cpp, la acelasi numar.
+        bool showPinCorrect(); // Afiseaza rezultatul AUTH corect deja confirmat, fara a comanda deblocarea.
+
+
     private:
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
         uint16_t address = 0;                                           //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti

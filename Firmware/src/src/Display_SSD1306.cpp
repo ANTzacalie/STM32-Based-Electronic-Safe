@@ -403,7 +403,11 @@ bool Display::showPinIncorrect(uint8_t attemptsLeft) // Defineste mesajul PIN in
     return showMessage(text("COD INCORECT", "WRONG PIN"), attempts, text("REINCERCATI", "TRY AGAIN"), ""); // Foloseste macheta comuna si propaga rezultatul transmisiei.
 } 
 
-
+// METODA 16 - showPinCorrect: declarata in include/Display.h, la acelasi numar.
+bool Display::showPinCorrect() // Defineste ecranul de succes al autentificarii, furnizat ca rezultat din exterior.
+{  
+    return showMessage(text("COD CORECT", "PIN ACCEPTED"), "", "", ""); // Afiseaza succesul primit; nu acorda ea insasi acces si nu controleaza servo.
+} 
 
 
 
