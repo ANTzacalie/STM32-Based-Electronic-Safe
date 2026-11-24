@@ -409,6 +409,11 @@ bool Display::showPinCorrect() // Defineste ecranul de succes al autentificarii,
     return showMessage(text("COD CORECT", "PIN ACCEPTED"), "", "", ""); // Afiseaza succesul primit; nu acorda ea insasi acces si nu controleaza servo.
 } 
 
+// METODA 17 - showPinMismatch: declarata in include/Display.h, la acelasi numar.
+bool Display::showPinMismatch() // Defineste eroarea vizuala a repetarii unui PIN nou.
+{ 
+    return showMessage(text("CODURILE DIFERA", "PIN DOES NOT MATCH"), text("REINCERCATI", "TRY AGAIN"), "", ""); // Prezinta un rezultat de comparare efectuat de logica viitoare, fara sa compare date secrete.
+} 
 
 
 

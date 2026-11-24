@@ -81,6 +81,13 @@ class Display
         // METODA 16 - showPinCorrect: definitia este in src/Display.cpp, la acelasi numar.
         bool showPinCorrect(); // Afiseaza rezultatul AUTH corect deja confirmat, fara a comanda deblocarea.
 
+        // METODA 17 - showPinMismatch: definitia este in src/Display.cpp, la acelasi numar.
+        bool showPinMismatch(); // Afiseaza ca doua introduceri ale unui PIN nou difera, fara sa le primeasca sau compare.
+
+
+
+
+
 
     private:
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
