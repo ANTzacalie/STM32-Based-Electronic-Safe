@@ -84,7 +84,8 @@ class Display
         // METODA 17 - showPinMismatch: definitia este in src/Display.cpp, la acelasi numar.
         bool showPinMismatch(); // Afiseaza ca doua introduceri ale unui PIN nou difera, fara sa le primeasca sau compare.
 
-
+        // METODA 18 - showCardReading: definitia este in src/Display.cpp, la acelasi numar.
+        bool showCardReading(); // Afiseaza citirea RFID in curs, fara acces SPI sau autorizare card.
 
 
 

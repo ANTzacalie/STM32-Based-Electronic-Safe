@@ -415,7 +415,11 @@ bool Display::showPinMismatch() // Defineste eroarea vizuala a repetarii unui PI
     return showMessage(text("CODURILE DIFERA", "PIN DOES NOT MATCH"), text("REINCERCATI", "TRY AGAIN"), "", ""); // Prezinta un rezultat de comparare efectuat de logica viitoare, fara sa compare date secrete.
 } 
 
-
+// METODA 18 - showCardReading: declarata in include/Display.h, la acelasi numar.
+bool Display::showCardReading() // Defineste ecranul citirii cardului in curs.
+{ 
+    return showMessage(text("CITIRE CARD RFID", "READING RFID CARD"), text("ASTEPTATI CITIREA", "PLEASE WAIT"), "", ""); // Afiseaza asteptarea, fara comenzi catre cititorul RFID.
+} 
 
 uint8_t Display::fontColumn(char character, uint8_t column) const // Defineste obtinerea desenului unei singure coloane de caracter.
 { 
