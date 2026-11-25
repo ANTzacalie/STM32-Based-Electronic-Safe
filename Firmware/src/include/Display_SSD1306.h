@@ -126,12 +126,16 @@ class Display
         bool ready = false;                                             //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
         EroareDisplay lastError = EroareDisplay::Neinitializat;         //ultima eroare de comunicatie sau de parametrii primiti de metodele de afisare
         bool sendCommands(const uint8_t* commands, uint8_t length);     //trimite comenzi SSD1306 si returneaza succesul transferului (cel mult 31 de comenzi/parametrii SSD1306 cu prefixul de control 0x00)
-        bool english = false;                                           //Porneste cu texte in romana; reprezinta doar preferinta vizuala curenta, nu un meniu sau o salvare in Flash
+        
         uint8_t buffer[512] = {};                                       //buffer local de pixeli, 128x32/8=512 octeti; un singur bit pentru fiecare pixel, initial toti pixelii sunt stinsi
         uint8_t fontColumn(char character, uint8_t column) const;       // Returneaza bitii unei coloane de caracter; nu acceseaza hardware.
         
 
         // Adresele si comenzile au nume proprii, ca sa nu fie ascunse in functii.
+
+        static const uint8_t CONTROL_PIXELI = 0x40; // Prefix SSD1306: octetii urmatori sunt pixeli.
+        static const uint16_t OCTETI_IMAGINE = 512; // Memoria imaginii: 128*32/8.
+
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
 

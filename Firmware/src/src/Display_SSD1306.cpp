@@ -92,8 +92,6 @@ bool Display::begin() // Leaga operatiile de pornire, fiecare avand propria func
 } 
 
 
-
-
 // METODA 03: getLastError - Returneaza prin valoare codul memorat in ultimaEroare, din lista EroareDisplay. Nu trimite pe I2C, nu modifica obiectul si nu returneaza un pointer la text.
 EroareDisplay Display::getLastError() const // Defineste metoda declarata in header pentru consultarea erorii.
 { // citirea erorii.
@@ -112,10 +110,20 @@ void Display::setEnglish(bool engleza) // Schimba numai alegerea textelor afisaj
     limbaEngleza = engleza; // Retine preferinta; ecranul se redeseneaza cand apelantul cere un mesaj nou.
 }
 
+// METODA 06: stergeBuffer - Pune zero in cei 512 octeti ai imaginii din RAM si pastreaza prefixul I2C pentru pixeli. Nu trimite nimic: textul deja vizibil pe OLED ramane pana cand se apeleaza afiseaza.
+void Display::stergeBuffer() // Inlocuieste clear cu un nume care spune clar ce se sterge.
+{ // golirea imaginii locale.
+    buffer[0] = CONTROL_PIXELI; // Primul octet ramane prefixul I2C pentru date grafice.
+    for (uint16_t index = 1; index <= OCTETI_IMAGINE; index++) // Parcurge simplu cei 512 octeti de imagine, de la 1 la 512.
+    { // stergerea unui octet din RAM.
+        buffer[index] = 0; // Stinge in RAM cei opt pixeli ai octetului, fara comanda I2C.
+    } 
+}
 
 
 
-//metoda 6 - setBrightness: declarata in Display.h, la acelasi numar
+
+//metoda  - setBrightness: declarata in Display.h, la acelasi numar
 bool Display::setBrightness(uint8_t level) //Defineste transmiterea unei trepte
 {
     if (level > 2) //Accepta numai 0=minim, 1=mediu si 2=maxim
