@@ -6,6 +6,9 @@
 #include "stm32f1xx_hal.h"
 #include <stdint.h>
 
+
+
+
 /*
  - O clasa enumerare pentru identificarea erorilor RFID.
  - Fiecare valoare reprezinta o situatie care poate aparea in timpul functionarii cititorului.
