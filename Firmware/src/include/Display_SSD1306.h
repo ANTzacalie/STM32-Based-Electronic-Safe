@@ -21,9 +21,9 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
     DatePinInvalide,            //showPin a primit mai mult de 12 cifre de desenat sau mai mult de 3 incercari de afisat.   
     IncercariInvalide,          //showPinIncorrect a primit mai mult de 3 incercari ramase pentru mesajul de pe ecran.                         
 
-    TransferComenziEsuat        //HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
+    TransferComenziEsuat,       //HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
                                 //Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
-
+    ParametruInvalid // Un rand, o lungime Password sau o valoare de afisat nu este permisa.
 
 };
 
@@ -43,9 +43,12 @@ class Display
         // METODA 05: setEnglish - Retine true pentru texte in engleza sau false pentru romana. Alegerea se aplica mesajelor cerute ulterior; metoda nu redeseneaza imediat ecranul si nu salveaza limba in Flash.
         void setEnglish(bool engleza); // Alege limba urmatoarelor texte; nu proceseaza taste sau meniuri.
         
-        // METODA: stergeBuffer - Pune zero in cei 512 octeti ai imaginii din RAM si pastreaza prefixul I2C pentru pixeli. Nu trimite nimic: textul deja vizibil pe OLED ramane pana cand se apeleaza afiseaza.
+        // METODA 06: stergeBuffer - Pune zero in cei 512 octeti ai imaginii din RAM si pastreaza prefixul I2C pentru pixeli. Nu trimite nimic: textul deja vizibil pe OLED ramane pana cand se apeleaza afiseaza.
         void stergeBuffer(); // Sterge doar imaginea din RAM, nu ecranul fizic.
 
+        // METODA 07: stergeRand - Goleste in RAM numai cei 128 de octeti ai randului primit, numerotat 0..3, pastrand ceilalti trei randuri. Nu transmite pe OLED; pentru un rand invalid memoreaza ParametruInvalid si iese.
+        void stergeRand(uint8_t rand); // Sterge doar randul 0, 1, 2 sau 3 din RAM.
+        
         // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
         bool afiseaza(); // Trimite imaginea din RAM; nu o sterge dupa transmitere.
 
@@ -62,17 +65,18 @@ class Display
 
         bool refreshPanel();  // Retrimite configuratia OLED si imaginea pastrata in memoria STM32.
 
-        //METODA 03 - isReady: definitia este in src/Display.cpp, la acelasi numar
+        //METODA  - isReady: definitia este in src/Display.cpp, la acelasi numar
         bool isReady() const;  //returnare initializarea/ultimul transfer a reusit, fara o verificare electronica
 
-        //METODA 04 - getLastError: definitia este in src/Display.cpp, la acelasi numar
+        //METODA  - getLastError: definitia este in src/Display.cpp, la acelasi numar
         EroareDisplay getLastError() const;  //returnareza printr-o valoare eroarea din lista EroareDisplay, fara pointer sau text. un OLED defect nu poate avertiza singur
 
         
-        //METODA 06 - setBrightness: definitia este in src/Display.cpp, la acelasi numar
+        
+        //METODA  - setBrightness: definitia este in src/Display.cpp, la acelasi numar
         bool setBrightness(uint8_t level);   //primeste 0=minim, 1=mediu, 2=maxim. apelantul decide cand si de ce schimba nivelul
 
-        //METODA 07 - clear: definitia este in src/Display.cpp, la acelasi numar
+        //METODA  - clear: definitia este in src/Display.cpp, la acelasi numar
         void clear();    //sterge numai memoria de pixeli din RAM; 
 
         //METODA 08 - drawPixel: definitia este in src/Display.cpp, la acelasi numar
@@ -134,11 +138,17 @@ class Display
         // Adresele si comenzile au nume proprii, ca sa nu fie ascunse in functii.
 
         static const uint8_t CONTROL_PIXELI = 0x40; // Prefix SSD1306: octetii urmatori sunt pixeli.
+        static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
+
+        static const uint16_t LATIME = 128; // Numarul coloanelor de pixeli.
+
         static const uint16_t OCTETI_IMAGINE = 512; // Memoria imaginii: 128*32/8.
 
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
 
+        // METODA: setEroare - Primeste o valoare EroareDisplay si o memoreaza in ultimaEroare, pentru consultarea prin getLastError. Nu afiseaza mesaje si nu efectueaza recuperare automata.
+        void setEroare(EroareDisplay eroare); // Memoreaza simplu eroarea.
 
         // METODA: initializarePini - Activeaza ceasurile GPIOB/AFIO, pastreaza I2C1 neremapat si configureaza PB6/PB7 ca alternate function open-drain prin HAL. Nu configureaza pinii componentelor colegilor si nu returneaza o valoare.
         void initializarePini(); // Configureaza numai PB6 si PB7 pentru I2C1.

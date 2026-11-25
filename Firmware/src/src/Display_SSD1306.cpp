@@ -120,7 +120,21 @@ void Display::stergeBuffer() // Inlocuieste clear cu un nume care spune clar ce 
     } 
 }
 
+// METODA 07: stergeRand - Goleste in RAM numai cei 128 de octeti ai randului primit, numerotat 0..3, pastrand ceilalti trei randuri. Nu transmite pe OLED; pentru un rand invalid memoreaza ParametruInvalid si iese.
+void Display::stergeRand(uint8_t rand) // Sterge numai unul dintre cele patru randuri de opt pixeli.
+{ //  verificarea randului primit.
+    if (rand > ULTIMA_PAGINA) // Randurile permise sunt 0, 1, 2 si 3.
+    { // Deschide cazul unui rand inexistent.
+        setEroare(EroareDisplay::ParametruInvalid); // Retine eroarea, fara scriere in afara bufferului.
+        return; // Paraseste metoda fara a modifica imaginea.
+    } 
 
+    uint16_t inceput = uint16_t(1 + rand * LATIME); // Sare peste prefix si peste paginile anterioare randului.
+    for (uint16_t coloana = 0; coloana < LATIME; coloana++) // Parcurge numai cei 128 octeti ai randului ales.
+    { // stergerea unei coloane de opt pixeli.
+        buffer[inceput + coloana] = 0; // Goleste coloana randului, pastrand ceilalti trei randuri.
+    } 
+} 
 
 
 //metoda  - setBrightness: declarata in Display.h, la acelasi numar
@@ -154,7 +168,7 @@ bool Display::setBrightness(uint8_t level) //Defineste transmiterea unei trepte
     return true;                           //Confirma transmiterea treptei; nu afirma un anumit
 }
 
-//metoda 7 - clear: declarata in Display.h, la acelasi numar
+//metoda  - clear: declarata in Display.h, la acelasi numar
 void Display::clear() //Defineste stergerea memoriei grafice locale
 {
     for (uint16_t index = 0; index < sizeof buffer; ++index) //Viziteaza exact cei 512 octeti ai framebufferului
