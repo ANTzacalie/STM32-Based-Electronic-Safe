@@ -53,108 +53,51 @@ static const uint8_t digits[10][5] = // Defineste cele zece cifre in aceeasi org
 
 
 
-//Metoda 1 - Display: declarata in Display.h, la acelasi numar
+// METODA 01: Display - Creeaza obiectul si pregateste in RAM o imagine goala, cu octetul de control I2C. Nu configureaza pinii si nu trimite nimic pe OLED; hardware-ul este pregatit ulterior prin begin.
 Display::Display()
 {
-    //Trebuiesc initializate periferice dar nu inainte de HAL_Init
+   stergeBuffer(); // Pregateste in RAM o imagine goala; OLED-ul nu este inca initializat.
 }
 
-//Metoda 2 - begin: declarata in Display.h, la acelasi numar
-bool Display::begin()
-{
-    ready = false; //invalidare a vechii confirmari de comunicare, inclusiv la o reinitializare ceruta
-    address = 0; //resetare adresa memorata pentru a repeta detectarea modulului
-    __HAL_RCC_GPIOB_CLK_ENABLE();                           //Activare ceas GPIOB prin macro-ul HAL necesar configurarii PB6/PB7
-    __HAL_RCC_I2C1_CLK_ENABLE();                            //Activeaza ceasul in I2C1 prin HAL
-    GPIO_InitTypeDef pins = {};                             //Pregateste structura de configurare ceruta de HAL, cu toate campurile initial zero
-    pins.Pin = GPIO_PIN_6 | GPIO_PIN_7;                     //Selecteaza impreuna PB6 (=SCL) si PB7 (=SDA)
-    pins.Mode = GPIO_MODE_AF_OD;                            //Selecteaza functia alternativa open-drain folosita de I2C
-    pins.Speed = GPIO_SPEED_FREQ_HIGH;                      //Stabileste viteza de ccomutare a pinilor; frecventa magistralei se seteaza separat.
-    HAL_GPIO_Init(GPIOB, &pins);                            //Aplica configuratia prin HAL, trmitand adresa structurii pins   
-    i2c.Instance = I2C1;                                    //Leaga handle-lul clasei de perifericul I2C1; nu acceseaza manual registrii acestuia
-    i2c.Init.ClockSpeed = 100000;                           //Frecventa I2C initiata la 100 kHz
-    i2c.Init.DutyCycle = I2C_DUTYCYCLE_2;                   //Completeaza configuratia duty-cycle ceruta de HAL
-    i2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;      //Foloseste adrese I2C pe 7 biti pentru dispozitive
-    i2c.Init.OwnAddress1 = 0;                               //Nu foloseste adresa proprie a microcontrolerului deorece STM32 este masterul comunicatiei
-    i2c.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;     //Dezactiveaza a doua adresa proprie, nefolosita de OLED
-    i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;     //Dezactiveaza raspunsul perifericului la general-call.
-    i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;         //Dezactiveaza modul de intindere a semnalului SCL, nefolosit de OLED
+/// METODA 02: begin - Configureaza PB6/PB7 si I2C1, asteapta stabilizarea, cauta adresa OLED, trimite configurarea 128x32, afiseaza un cadru gol si porneste panoul. Returneaza true la succes sau false la primul esec, cu eroarea memorata.
+bool Display::begin() // Leaga operatiile de pornire, fiecare avand propria functie mica.
+{ 
+    initializat = false; // Nu presupunem ca o initializare precedenta este inca valabila.
+    initializarePini(); // Configureaza PB6 si PB7.
 
-
-    if (HAL_I2C_Init(&i2c) != HAL_OK)                     //Verifica daca HAL a reusit initializarea magistralei
-    {                                                     
-        lastError = EroareDisplay::InitializareI2CEsuata; //Retine codul erorii de configurare HAL, dupa modelul lui Antonio
-        return false;                                     //Opreste initializarea fara a presupune ca OLED-ul este disponibil
+    if (initializareI2C() == false) // Verifica configurarea perifericului STM32.
+    { //  cazul initializarii I2C esuate.
+        return false; // Pastreaza eroarea stabilita de initializareI2C.
+    } 
+        
+    HAL_Delay(STABILIZARE_OLED_MS); // Asteapta stabilizarea OLED doar la pornire, nu la fiecare ecran.
+    if (cautaOLED() == false) // Verifica raspunsul la adresele posibile.
+    { // cazul OLED-ului absent.
+        return false; // Opreste pornirea si pastreaza diagnosticul.
     } 
     
+    if (configureazaOLED() == false) // Trimite parametrii de configurare 128x32.
+    { // cazul configurarii SSD1306 esuate.
+        return false; // Nu afiseaza o imagine pe un modul neconfigurat.
+    } 
 
-    for (uint8_t addr = 0x3C; addr <= 0x3D; ++addr)     //Incearca cele doua adrese uzuale SSD1306 pe 7 biti
-        {
-            if (HAL_I2C_IsDeviceReady(&i2c,uint16_t (addr << 1), 3, 10) == HAL_OK) //Verifica daca OLED-ul raspunde la adresa curenta
-            {
-                address = addr << 1; //Salveaza adresa OLED in format HAL (8 biti)
-                break; 
-            }
-        }
-
-
-    if (address == 0) //Daca nu s-a gasit niciun OLED la adresele uzuale
-        {
-            lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
-            return false;                                  //Opreste initializarea fara a presupune ca OLED-ul este disponibil
-        }
+    initializat = true; // Permite transmiterea imaginii si controlul panoului.
+    stergeBuffer(); // Pregateste o imagine goala in RAM.
     
+    if (afiseaza() == false) // Trimite imaginea goala o singura data, la pornire.
+    { // cazul primului cadru netransmis.
+        return false; // Nu declara initializare completa daca prima imagine a esuat.
+    } 
+    return setPornit(true); // Porneste panoul numai dupa configurare si transmiterea cadrului initial.
+} 
 
-    if (address == 0)                                      //Daca nu s-a gasit niciun OLED la adresele uzuale
-        {
-            lastError = EroareDisplay::DisplayFaraRaspuns; //Retine codul erorii de comunicatie
-            return false;                                  //Opreste initializarea fara a presupune ca OLED-ul este disponibil
-        }
-    
 
-        ready = true;           // OLED-ul a raspuns la adresa I2C. Permitem trimiterea configuratiei.
-    return refreshPanel();      // begin() returneaza true numai daca reuseste si trimiterea imaginii.
-} // Aici se termina Display::begin().
-
-// Reaplica setarile panoului si retrimite imaginea care exista deja in buffer.
-bool Display::refreshPanel()
-{
-    if (!ready)             // Verifica daca driverul considera comunicatia disponibila.
-    {
-        return false;       // DISPLAY_OLED_SERVICE() va apela begin() pentru o noua detectare.
-    }
-
-    const uint8_t commands[] = {  // Comenzile de configurare pentru SSD1306 de 128x32.
-        0xD5, 0x80,               // Configureaza ceasul intern al controlerului OLED.
-        0xA8, 0x1F,               // Selecteaza 32 de linii de afisare: 0x1F inseamna 32 - 1.
-        0xD3, 0x00,               // Stabileste deplasarea verticala la zero.
-        0x40,                     // Afisarea incepe de la linia zero.
-        0x8D, 0x14,               // Activeaza pompa interna de tensiune a OLED-ului.
-        0x20, 0x00,               // Selecteaza adresarea orizontala a memoriei de pixeli.
-        0xA1, 0xC8,               // Stabileste orientarea coloanelor si sensul de scanare a liniilor.
-        0xDA, 0x02,               // Configureaza iesirile COM pentru panoul de 128x32.
-        0x81, contrast,           // Reaplica ultima valoare de contrast memorata de clasa.
-        0xD9, 0xF1,               // Configureaza intervalul de preincarcare a pixelilor.
-        0xDB, 0x40,               // Configureaza nivelul electric VCOMH al panoului.
-        0xA4,                     // Afiseaza pixelii conform continutului memoriei OLED.
-        0xA6,                     // Selecteaza afisarea normala, cu pixelii neinversati.
-        0xAF                      // Porneste afisarea.
-    };
-
-    if (!sendCommands(commands, uint8_t(sizeof commands)))  // Trimite tot tabloul prin I2C.
-    {
-        return false;         // sendCommands() a memorat deja eroarea de comunicatie.
-    }
-
-    dirtyPages = 0x0F;        // 0x0F = 00001111: marcheaza toate cele 4 pagini pentru trimitere.
-    return update();          // Copiaza imaginea din memoria STM32 in memoria OLED-ului.
-}
 
 
 //Metoda 3 - isReady: declarata in Display.h, la acelasi numar
 bool Display::isReady() const       //Defineste citirea starii software a modulului, fara modificarea obiectului
 {
-    return ready;                   //Returneaza rezultatul initializarii/ultimelor transferuri, nu o masurare electrica noua
+    return initializat  ;                   //Returneaza rezultatul initializarii/ultimelor transferuri, nu o masurare electrica noua
 }
 
 //metoda 4 - getLastError: declarata in Display.h, la acelasi numar

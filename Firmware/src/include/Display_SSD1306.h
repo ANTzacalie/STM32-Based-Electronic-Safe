@@ -36,6 +36,23 @@ class Display
 
         //METODA 02 - begin: definitia este in src/Display.cpp, la acelasi numar
         bool begin();   // configurare PB6/PB7 si I2C prin HAL, detectare OLED si trimitere initilizare in SSD1306
+        
+        // METODA: stergeBuffer - Pune zero in cei 512 octeti ai imaginii din RAM si pastreaza prefixul I2C pentru pixeli. Nu trimite nimic: textul deja vizibil pe OLED ramane pana cand se apeleaza afiseaza.
+        void stergeBuffer(); // Sterge doar imaginea din RAM, nu ecranul fizic.
+
+        // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
+        bool afiseaza(); // Trimite imaginea din RAM; nu o sterge dupa transmitere.
+
+        // METODA: setPornit - Trimite comanda ON daca pornit=true sau OFF daca este false, dupa verificarea initializarii. Nu intrerupe alimentarea fizica si nu sterge bufferul imaginii; returneaza succesul transferului.
+        bool setPornit(bool pornit); // Aprinde/stinge panoul fara sa stearga imaginea salvata in buffer.
+
+
+
+
+
+
+
+
 
         bool refreshPanel();  // Retrimite configuratia OLED si imaginea pastrata in memoria STM32.
 
@@ -93,6 +110,12 @@ class Display
     private:
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
         uint16_t address = 0;                                           //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
+        bool initializat = false; // Inlocuieste numele ready; indica pregatirea comunicatiei, nu daca exista deja text pe ecran.
+       
+
+
+
+       
         uint8_t dirtyPages = 0;                                         //Ceii patru biti inferiori indica paginile de cate 8 linii care trebuie retransmise
         uint8_t contrast = 0x01;                                        // Porneste la contrast minim si retine apoi ultima valoare trimisa cu succes.
         bool ready = false;                                             //confirmare de comunicatie reusita, inclusiv dupa transmiterea secventei de configurare
@@ -101,6 +124,28 @@ class Display
         bool english = false;                                           //Porneste cu texte in romana; reprezinta doar preferinta vizuala curenta, nu un meniu sau o salvare in Flash
         uint8_t buffer[512] = {};                                       //buffer local de pixeli, 128x32/8=512 octeti; un singur bit pentru fiecare pixel, initial toti pixelii sunt stinsi
         uint8_t fontColumn(char character, uint8_t column) const;       // Returneaza bitii unei coloane de caracter; nu acceseaza hardware.
+        
+
+        // Adresele si comenzile au nume proprii, ca sa nu fie ascunse in functii.
+        static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
+
+
+
+        // METODA: initializarePini - Activeaza ceasurile GPIOB/AFIO, pastreaza I2C1 neremapat si configureaza PB6/PB7 ca alternate function open-drain prin HAL. Nu configureaza pinii componentelor colegilor si nu returneaza o valoare.
+        void initializarePini(); // Configureaza numai PB6 si PB7 pentru I2C1.
+
+        // METODA: initializareI2C - Activeaza I2C1, completeaza handle-ul HAL pentru 100 kHz si adrese pe sapte biti, apoi aplica HAL_I2C_Init. Returneaza true la succes sau false cu InitializareI2CEsuata memorata; nu detecteaza OLED-ul.
+        bool initializareI2C(); // Completeaza handle-ul si apeleaza HAL_I2C_Init.
+
+        // METODA: cautaOLED - Incearca adresele numite 0x3C si 0x3D, transformate in format HAL, si pastreaza adresa care raspunde. Returneaza true la primul ACK; altfel memoreaza DisplayFaraRaspuns si returneaza false.
+        bool cautaOLED(); // Incearca cele doua adrese numite mai sus.
+
+        // METODA: configureazaOLED - Construieste pachetul de comenzi numite pentru SSD1306 128x32: orientare, adresare, contrast initial si parametrii panoului. Il trimite prin transmite si returneaza rezultatul; nu porneste aici logica seifului.
+        bool configureazaOLED(); // Trimite secventa SSD1306 pentru 128x32.
+
+
+
+
         
         // METODA  - drawBattery: definitia este in src/Display.cpp, la acelasi numar.
         void drawBattery(bool valid, uint8_t percent); // Deseneaza pictograma din datele primite; procent invalid inseamna semnul intrebarii.
