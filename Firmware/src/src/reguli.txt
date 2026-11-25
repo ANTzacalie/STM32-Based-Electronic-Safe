@@ -19,7 +19,7 @@
 
 *** // STAGI DE EXECUTARE PROIECT // ***
 /*
-   1. Toate clasele trebuie sa aiba #include<Safe.h>;
-   2. 
+   1. Toate clasele trebuie sa aiba #include "stm32f1xx_hal.h";
+
 /*
 *** // STAGI DE EXECUTARE PROIECT // ***

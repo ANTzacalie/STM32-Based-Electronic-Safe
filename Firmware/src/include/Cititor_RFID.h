@@ -58,8 +58,7 @@ class Cititor_RFID {
       uint8_t verificaCard();
 
       // Returneaza ultima eroare inregistrata
-      EroareRFID getUltimaEroare() const 
-      {
+      EroareRFID getUltimaEroare() const {
           return ultimaEroare;
       }
 

@@ -1,7 +1,41 @@
 
 //// TESTE LEGATE DE CELE DOUA PAGINI REZERVATE IN MEMORIE ////
 
+// SCRIERE SI STERGERE + handleErrorFLASH
+void MEMORIE_RFID_TEST(Memorie_RFID memorieRFID)
+{
 
+    // Programam o valoare de test in pagina 128 (index 127);
+    if (memorieRFID.paginaEsteGoala())
+    {
+        if (HAL_FLASH_Unlock() == HAL_OK)
+        {
+            HAL_FLASH_Program(
+                FLASH_TYPEPROGRAM_HALFWORD,
+                0x0801FC00U,
+                0x5A3C);
+
+            HAL_FLASH_Lock();
+        }
+    }
+    
+    // Verificam starea initiala;
+    volatile uint8_t paginaGoalaInainte = memorieRFID.paginaEsteGoala();
+
+    // Executam stergerea;
+    volatile uint8_t paginaStearsa = memorieRFID.stergePagina128();
+
+    // Retinem ultima eroare;
+    volatile RFID_MEM_ERR eroareMemorie = memorieRFID.getUltimaEroare();
+
+    // Verificam starea finala;
+    volatile uint8_t paginaGoalaDupa = memorieRFID.paginaEsteGoala();
+
+    // Breakpoint;
+    __NOP();
+}
+
+// SCRIERE 
 void MEMORIE_RFID_TEST(Memorie_RFID memorieRFID)
 {
 

@@ -17,11 +17,9 @@ extern "C" void SysTick_Handler(void)
     HAL_IncTick();
 }
 
+
 void MEMORIE_RFID_TEST(Memorie_RFID memorieRFID)
 {
-
-    // Verificam daca ultima pagina flash este goala;
-    volatile uint8_t paginaGoala = memorieRFID.paginaEsteGoala();
 
     // Breakpoint;
     __NOP();
