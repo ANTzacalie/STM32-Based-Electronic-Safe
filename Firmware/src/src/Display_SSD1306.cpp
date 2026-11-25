@@ -94,23 +94,26 @@ bool Display::begin() // Leaga operatiile de pornire, fiecare avand propria func
 
 
 
-//Metoda 3 - isReady: declarata in Display.h, la acelasi numar
-bool Display::isReady() const       //Defineste citirea starii software a modulului, fara modificarea obiectului
-{
-    return initializat  ;                   //Returneaza rezultatul initializarii/ultimelor transferuri, nu o masurare electrica noua
+// METODA 03: getLastError - Returneaza prin valoare codul memorat in ultimaEroare, din lista EroareDisplay. Nu trimite pe I2C, nu modifica obiectul si nu returneaza un pointer la text.
+EroareDisplay Display::getLastError() const // Defineste metoda declarata in header pentru consultarea erorii.
+{ // citirea erorii.
+    return ultimaEroare; // Returneaza o copie din lista EroareDisplay, nu un pointer la text.
+} 
+
+// METODA 04: esteInitializat - Returneaza valoarea lui initializat: true daca afisajul este pregatit pentru comunicatie, false inainte de pornire sau dupa un defect de transfer. Nu verifica din nou cablurile si nu spune daca panoul este aprins.
+bool Display::esteInitializat() const // Defineste consultarea starii comunicatiei.
+{ // consultarea.
+    return initializat; // True inseamna ca begin a reusit si nu a aparut ulterior o eroare de transfer.
+} 
+
+// METODA 05: setEnglish - Retine true pentru texte in engleza sau false pentru romana. Alegerea se aplica mesajelor cerute ulterior; metoda nu redeseneaza imediat ecranul si nu salveaza limba in Flash.
+void Display::setEnglish(bool engleza) // Schimba numai alegerea textelor afisajului.
+{ // alegerea limbii.
+    limbaEngleza = engleza; // Retine preferinta; ecranul se redeseneaza cand apelantul cere un mesaj nou.
 }
 
-//metoda 4 - getLastError: declarata in Display.h, la acelasi numar
-EroareDisplay Display::getLastError() const 
-{                            //Defineste metoda declarata in .h; rezultatul este un cod din lista de erori
-    return lastError;        //Copiaza ultima eroare catre apelant; nu returneaza un pointer si nu modifica obiectul
-}
 
-//metoda 5 - setEnglish: declarata in Display.h, la acelasi numar
-void Display::setEnglish(bool enabled) //Defineste alegerea preferintei vizuale, fara meniu sau persistenta
-{
-    english = enabled;                 //retine true pentru engleza si false pentru romana; apelantul redeseneaza apoi ecranul dorit
-}
+
 
 //metoda 6 - setBrightness: declarata in Display.h, la acelasi numar
 bool Display::setBrightness(uint8_t level) //Defineste transmiterea unei trepte

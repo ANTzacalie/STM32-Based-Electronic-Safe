@@ -31,11 +31,17 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
 class Display  
 {
     public:  // apelare din main sau clasele celorlalti colegi
-        //METODA 01 - Display: definitia este in src/Display.cpp, la acelasi numar
+        // METODA 01: Display - Creeaza obiectul si pregateste in RAM o imagine goala, cu octetul de control I2C. Nu configureaza pinii si nu trimite nimic pe OLED; hardware-ul este pregatit ulterior prin begin.
         Display();      //constructor
 
-        //METODA 02 - begin: definitia este in src/Display.cpp, la acelasi numar
+        // METODA 02: begin - Configureaza PB6/PB7 si I2C1, asteapta stabilizarea, cauta adresa OLED, trimite configurarea 128x32, afiseaza un cadru gol si porneste panoul. Returneaza true la succes sau false la primul esec, cu eroarea memorata.
         bool begin();   // configurare PB6/PB7 si I2C prin HAL, detectare OLED si trimitere initilizare in SSD1306
+        
+        // METODA 04: esteInitializat - Returneaza valoarea lui initializat: true daca afisajul este pregatit pentru comunicatie, false inainte de pornire sau dupa un defect de transfer. Nu verifica din nou cablurile si nu spune daca panoul este aprins.
+        bool esteInitializat() const; // Arata daca OLED-ul a fost initializat si nu a aparut o eroare de comunicatie.
+
+        // METODA 05: setEnglish - Retine true pentru texte in engleza sau false pentru romana. Alegerea se aplica mesajelor cerute ulterior; metoda nu redeseneaza imediat ecranul si nu salveaza limba in Flash.
+        void setEnglish(bool engleza); // Alege limba urmatoarelor texte; nu proceseaza taste sau meniuri.
         
         // METODA: stergeBuffer - Pune zero in cei 512 octeti ai imaginii din RAM si pastreaza prefixul I2C pentru pixeli. Nu trimite nimic: textul deja vizibil pe OLED ramane pana cand se apeleaza afiseaza.
         void stergeBuffer(); // Sterge doar imaginea din RAM, nu ecranul fizic.
@@ -62,9 +68,7 @@ class Display
         //METODA 04 - getLastError: definitia este in src/Display.cpp, la acelasi numar
         EroareDisplay getLastError() const;  //returnareza printr-o valoare eroarea din lista EroareDisplay, fara pointer sau text. un OLED defect nu poate avertiza singur
 
-        //METODA 05 - setEnglish: definitia este in src/Display.cpp, la acelasi numar
-        void setEnglish(bool enabled);       //selectare numai texte englezesti/romanesti; nu navigheaza si nu salveaza alegerea in Flash
-
+        
         //METODA 06 - setBrightness: definitia este in src/Display.cpp, la acelasi numar
         bool setBrightness(uint8_t level);   //primeste 0=minim, 1=mediu, 2=maxim. apelantul decide cand si de ce schimba nivelul
 
@@ -111,7 +115,8 @@ class Display
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
         uint16_t address = 0;                                           //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
         bool initializat = false; // Inlocuieste numele ready; indica pregatirea comunicatiei, nu daca exista deja text pe ecran.
-       
+        bool limbaEngleza = false; // False inseamna texte in romana, true inseamna engleza.
+        EroareDisplay ultimaEroare = EroareDisplay::Neinitializat; // Retine o valoare din lista de erori, fara pointer la text.
 
 
 
@@ -146,7 +151,7 @@ class Display
 
 
 
-        
+
         // METODA  - drawBattery: definitia este in src/Display.cpp, la acelasi numar.
         void drawBattery(bool valid, uint8_t percent); // Deseneaza pictograma din datele primite; procent invalid inseamna semnul intrebarii.
 
