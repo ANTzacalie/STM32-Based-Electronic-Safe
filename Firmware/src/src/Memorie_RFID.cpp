@@ -23,12 +23,14 @@ uint8_t Memorie_RFID::paginaEsteGoala() const
             
             *** Citim continutul Flash direct din memorie a pagini 128[ULTIMA-PAGINA] ***
 
-           - reinterpret_cast transforma adresa numerica intrun pointer, * ia valoarea 
-           efectiva si o pune in variabila, iar volatile indica tipul si regulile de acces la memorie;
+           - reinterpret_cast transforma adresa numerica intrun pointer fara nicio conversia a valori, * ia valoarea 
+           efectiva si o atribuie lui valoare, iar volatile indica regulile de acces la memorie;
 
            - volatile ii spune compilatorului că accesul la acea locație de memorie trebuie 
-           efectuat efectiv și nu trebuie eliminat sau combinat arbitrar cu alte accesări volatile.
+           efectuat efectiv(real) și nu trebuie eliminat sau combinat arbitrar cu alte accesări volatile, mai 
+           pe scurt ii spune compilatorului sa nu o optimizeze aceasta variabila etc.
 
+           - const asigura ca doar citim prin acest pointer, si in niciun caz scriiere;
         */
         uint32_t valoare = *reinterpret_cast<volatile const uint32_t*>(adresa);
         //        val    = val_ef(adr_numerica(adresa) -> pointer de typ uint32_t);

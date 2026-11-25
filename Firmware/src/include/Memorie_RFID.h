@@ -30,19 +30,18 @@ class Memorie_RFID
 
         Memorie_RFID();
 
-        
-
         /*
 
             - Verifica daca pagina flash rezervata este complet stearsa(contine doar 0xFF);
                 => 1 - Pagina este goala;
                 => 0 - exista date in pagina;
 
-        */
-        uint8_t paginaEsteGoala() const;
+        */ 
+        uint8_t paginaEsteGoala() const; // membrii nu pot fi modificati, read only;
 
     private:
 
+        // constexpr spune compilatorului sa seteaza valoarea in variabla la compilare, nu la runtime;
         // Adresa primei locatii din pagina 127;
         static constexpr uint32_t ADRESA_FLASH = 0x0801FC00U;
 
