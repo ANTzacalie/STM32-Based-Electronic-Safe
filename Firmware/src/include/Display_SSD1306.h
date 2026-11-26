@@ -49,6 +49,9 @@ class Display
         // METODA 07: stergeRand - Goleste in RAM numai cei 128 de octeti ai randului primit, numerotat 0..3, pastrand ceilalti trei randuri. Nu transmite pe OLED; pentru un rand invalid memoreaza ParametruInvalid si iese.
         void stergeRand(uint8_t rand); // Sterge doar randul 0, 1, 2 sau 3 din RAM.
         
+        // METODA 08: deseneazaPixel - Primeste coordonatele x/y si starea aprins, gaseste octetul si bitul pixelului, apoi aprinde sau stinge numai acel bit in RAM. Ignora coordonatele din afara panoului si nu transmite pe I2C.
+        void deseneazaPixel(int x, int y, bool aprins = true); // Modifica un pixel in buffer, fara transmisie I2C.
+
         // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
         bool afiseaza(); // Trimite imaginea din RAM; nu o sterge dupa transmitere.
 
@@ -79,7 +82,7 @@ class Display
         //METODA  - clear: definitia este in src/Display.cpp, la acelasi numar
         void clear();    //sterge numai memoria de pixeli din RAM; 
 
-        //METODA 08 - drawPixel: definitia este in src/Display.cpp, la acelasi numar
+        //METODA - drawPixel: definitia este in src/Display.cpp, la acelasi numar
         void drawPixel(int x, int y, bool on = true);   //aprinde/stinge un pixel valid din buffer; implicit on=true
 
         //METODA 09 - update: definitia este in src/Display.cpp, la acelasi numar
@@ -141,11 +144,14 @@ class Display
         static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
 
         static const uint16_t LATIME = 128; // Numarul coloanelor de pixeli.
+        static const uint8_t INALTIME = 32; // Numarul liniilor de pixeli.
 
         static const uint16_t OCTETI_IMAGINE = 512; // Memoria imaginii: 128*32/8.
 
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
+
+        static const uint8_t mastiPixeli[8]; // Valorile 1,2,4,...128, pentru cei opt biti ai unui octet.
 
         // METODA: setEroare - Primeste o valoare EroareDisplay si o memoreaza in ultimaEroare, pentru consultarea prin getLastError. Nu afiseaza mesaje si nu efectueaza recuperare automata.
         void setEroare(EroareDisplay eroare); // Memoreaza simplu eroarea.
