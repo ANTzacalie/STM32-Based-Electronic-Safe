@@ -58,7 +58,8 @@ class Display
         // METODA 10: scrieText - Parcurge sirul primit si apeleaza scrieCaracter pentru fiecare caracter, avansand cu sase pixeli. Se opreste la terminator sau marginea dreapta, ignora pointerul nul/originea invalida si modifica doar RAM-ul.
         void scrieText(int x, int y, const char* text); // Deseneaza textul in RAM, caracter cu caracter.
 
-
+        // METODA 11: scrieRand - Primeste un rand 0..3 si un text, sterge numai acel rand din RAM si scrie noul text la inaltimea corespunzatoare. Nu afiseaza inca; pentru un rand invalid retine eroarea si iese.
+        void scrieRand(uint8_t rand, const char* text); // Inlocuieste textul unui singur rand in RAM.
 
 
         // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.

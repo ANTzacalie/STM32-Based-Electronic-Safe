@@ -195,6 +195,20 @@ void Display::scrieText(int x, int y, const char* text) // Scrie un sir, apeland
     } 
 } 
 
+// METODA 11: scrieRand - Primeste un rand 0..3 si un text, sterge numai acel rand din RAM si scrie noul text la inaltimea corespunzatoare. Nu afiseaza inca; pentru un rand invalid retine eroarea si iese.
+void Display::scrieRand(uint8_t rand, const char* text) // Inlocuieste continutul unui singur rand din RAM.
+{ // verificarea randului.
+    if (rand > ULTIMA_PAGINA) // Nu permite alte randuri decat 0..3.
+    { // cazul randului invalid.
+        setEroare(EroareDisplay::ParametruInvalid); // Memoreaza argumentul gresit.
+        return; // Nu modifica memoria imaginii.
+    } 
+    
+    stergeRand(rand); // Goleste doar cei 128 B ai randului care va fi inlocuit.
+    scrieText(0, rand * 8, text); // Transforma numarul randului in coordonata verticala.
+} 
+
+
 
 
 //metoda  - setBrightness: declarata in Display.h, la acelasi numar
