@@ -208,7 +208,27 @@ void Display::scrieRand(uint8_t rand, const char* text) // Inlocuieste continutu
     scrieText(0, rand * 8, text); // Transforma numarul randului in coordonata verticala.
 } 
 
+// METODA 12: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
+bool Display::afiseaza() // Trimite simplu tot cadrul, fara dirtyPages sau comparatii de cache.
+{ // actualizarea OLED.
+    if (verificaInitializare() == false) // Verifica o singura data ca putem comunica.
+    { // cazul display-ului neinitializat sau cu eroare de transport.
+        return false; // Nu sterge imaginea; doar refuza un transfer nesigur.
+    } 
 
+    uint8_t zona[] = { // Pregateste fereastra pentru intregul panou.
+        CONTROL_COMENZI, // Pachetul contine comenzi.
+        COMANDA_COLOANE, PRIMA_COLOANA, ULTIMA_COLOANA, // Foloseste coloanele 0..127.
+        COMANDA_PAGINI, PRIMA_PAGINA, ULTIMA_PAGINA // Foloseste paginile 0..3, adica toate cele 32 de linii.
+    };
+
+    if (transmite(zona, uint16_t(sizeof zona)) == false) // Configureaza zona inaintea datelor.
+    { // Deschide cazul in care zona nu a putut fi selectata.
+        return false; // Nu trimite imaginea intr-o pozitie necunoscuta.
+    } 
+    
+    return transmite(buffer, OCTETI_TRANSMISIE); // Trimite prefixul si cei 512 B; NU sterge bufferul dupa transmitere.
+} 
 
 
 //metoda  - setBrightness: declarata in Display.h, la acelasi numar

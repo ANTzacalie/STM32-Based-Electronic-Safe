@@ -149,15 +149,22 @@ class Display
         
 
         // Adresele si comenzile au nume proprii, ca sa nu fie ascunse in functii.
-
+        static const uint8_t CONTROL_COMENZI = 0x00; // Prefix SSD1306: octetii urmatori sunt comenzi si parametri.
         static const uint8_t CONTROL_PIXELI = 0x40; // Prefix SSD1306: octetii urmatori sunt pixeli.
         static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
 
+        static const uint8_t COMANDA_COLOANE = 0x21; // Selecteaza prima si ultima coloana de transfer.
+        static const uint8_t PRIMA_COLOANA = 0; // Transferul imaginii incepe din coloana zero.
+        static const uint8_t ULTIMA_COLOANA = 127; // Ultima coloana a OLED-ului 128x32.
+        static const uint8_t COMANDA_PAGINI = 0x22; // Selecteaza prima si ultima pagina de transfer.
+        static const uint8_t PRIMA_PAGINA = 0; // Prima pagina de opt linii.
+        static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
+        
         static const uint16_t LATIME = 128; // Numarul coloanelor de pixeli.
         static const uint8_t INALTIME = 32; // Numarul liniilor de pixeli.
 
         static const uint16_t OCTETI_IMAGINE = 512; // Memoria imaginii: 128*32/8.
-
+        static const uint16_t OCTETI_TRANSMISIE = 513; // Imaginea plus un octet de control I2C.
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
 
@@ -178,13 +185,17 @@ class Display
         // METODA: configureazaOLED - Construieste pachetul de comenzi numite pentru SSD1306 128x32: orientare, adresare, contrast initial si parametrii panoului. Il trimite prin transmite si returneaza rezultatul; nu porneste aici logica seifului.
         bool configureazaOLED(); // Trimite secventa SSD1306 pentru 128x32.
 
+        // METODA: transmite - Primeste un pachet intern si lungimea lui si il trimite prin HAL_I2C_Master_Transmit cu timeout de 100 ms. La esec retrage initializat si retine timeout/comenzi/imagine; la succes retine NicioEroare si returneaza true.
+        bool transmite(uint8_t* date, uint16_t lungime); // Singurul loc care trimite un pachet prin HAL_I2C_Master_Transmit.
+
         // METODA: coloanaCaracter - Primeste un caracter pregatit si o coloana interna 0..4 si returneaza masca celor opt pozitii verticale din font. Cauta litere/cifre/semne si returneaza zero pentru spatiu sau simbol nesuportat; nu deseneaza singura.
         uint8_t coloanaCaracter(char caracter, uint8_t coloana) const; // Citeste cinci coloane de font, fara hardware.
 
         // METODA: deseneazaColoana - Primeste pozitia si un octet de font, verifica pe rand cei opt biti si apeleaza deseneazaPixel cu starea aprins/stins. Modifica o singura coloana in RAM, fara transmisie I2C.
         void deseneazaColoana(int x, int y, uint8_t valoare); // Deseneaza cei sapte pixeli ai unei coloane de caracter.
 
-       
+        // METODA: verificaInitializare - Returneaza false daca initializat este false sau true daca putem incerca o comanda de afisaj. Nu trimite pe I2C, nu reface initializarea si nu sterge bufferul ori imaginea vizibila.
+        bool verificaInitializare(); // Verifica daca putem trimite; nu sterge si nu modifica imaginea.
        
        
         // METODA  - drawBattery: definitia este in src/Display.cpp, la acelasi numar.
