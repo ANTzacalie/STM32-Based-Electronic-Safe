@@ -55,6 +55,10 @@ class Display
         // METODA 09: scrieCaracter - Primeste un caracter si pozitia lui, transforma literele mici in mari si deseneaza cinci coloane de font plus una libera. Inlocuieste si pixelii stinsi ai celulei de 6x8, fara actualizare fizica.
         void scrieCaracter(int x, int y, char caracter); // Deseneaza un singur caracter si spatiul lui liber.
 
+        // METODA 10: scrieText - Parcurge sirul primit si apeleaza scrieCaracter pentru fiecare caracter, avansand cu sase pixeli. Se opreste la terminator sau marginea dreapta, ignora pointerul nul/originea invalida si modifica doar RAM-ul.
+        void scrieText(int x, int y, const char* text); // Deseneaza textul in RAM, caracter cu caracter.
+
+
 
 
         // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
@@ -93,7 +97,7 @@ class Display
         //METODA - update: definitia este in src/Display.cpp, la acelasi numar
         bool update();   //trimite paginile modificate catre OLED; false inseamna ca OLED-ul nu a raspuns sau a esuat transferul
         
-        //METODA 10 - drawText: definitia este in src/Display.cpp, la acelasi numar
+        //METODA - drawText: definitia este in src/Display.cpp, la acelasi numar
         void drawText(int x, int y, const char* value);  //deseneaza un text in bufferul local de pixeli; nu trimite inca un cadru separat
 
         //METODA 11 - getBuffer: definitia este in src/Display.cpp, la acelasi numar

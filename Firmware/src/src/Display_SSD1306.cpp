@@ -177,7 +177,23 @@ void Display::scrieCaracter(int x, int y, char caracter) // Deseneaza o singura 
     } 
 } 
 
+// METODA 10: scrieText - Parcurge sirul primit si apeleaza scrieCaracter pentru fiecare caracter, avansand cu sase pixeli. Se opreste la terminator sau marginea dreapta, ignora pointerul nul/originea invalida si modifica doar RAM-ul.
+void Display::scrieText(int x, int y, const char* text) // Scrie un sir, apeland repetat functia pentru un singur caracter.
+{ // verificarea sirului.
+    if (text == nullptr || x < 0 || y < 0 || y >= INALTIME) // Nu citeste un pointer nul si nu foloseste o origine invalida.
+    { // cazul argumentelor neutilizabile.
+        return; // Iese fara citire invalida sau modificarea ecranului fizic.
+    }
 
+    uint16_t index = 0; // Incepe cu primul caracter al textului.
+   
+    while (text[index] != '\0' && x <= LATIME - 6) // Continua pana la sfarsitul textului sau marginea dreapta.
+    { // scrierea caracterului curent.
+        scrieCaracter(x, y, text[index]); // Deseneaza un singur caracter in RAM.
+        x = x + 6; // Avanseaza pozitia cu latimea celulei caracterului.
+        index++; // Trece la urmatorul caracter din sir.
+    } 
+} 
 
 
 
@@ -227,32 +243,8 @@ void Display::clear() //Defineste stergerea memoriei grafice locale
 
  
 
-// METODA - drawText: declarata in include/Display.h, la acelasi numar.
-void Display::drawText(int x, int y, const char* value) // Defineste desenarea unui sir primit din exterior.
-{ 
-    if (value == nullptr || x < 0 || y < 0 || y >= 32)  // Respinge pointerul nul si originea din afara zonei verticale sau la stanga panoului.
-    { 
-        return;                                         // Nu citeste un pointer invalid si nu deseneaza in afara framebufferului.
-    } 
 
-
-    for (; *value != '\0' && x <= 123; ++value, x += 6) // Parcurge sirul pana la terminator sau ultima origine la care incape un caracter de cinci pixeli.
-    { 
-        for (uint8_t column = 0; column < 5; ++column)  // Parcurge cele cinci coloane ale caracterului.
-        { 
-            const uint8_t bits = fontColumn(*value, column); // Citeste masca de sapte pixeli verticali din font.
-            for (uint8_t bit = 0; bit < 7; ++bit)            // Parcurge cei sapte biti verticali utili ai mastii.
-            {                                                // Deschide verificarea unui pixel al literei.
-                if ((bits & (1U << bit)) != 0)               // Selecteaza numai pixelii aprinsi din desenul caracterului.
-                { 
-                    drawPixel(x + column, y + bit);          // Foloseste verificarea limitelor si marcarea paginii din drawPixel.
-                } 
-            } 
-        } 
-    } 
-} 
-
-// METODA 10 - update: declarata in include/Display.h, la acelasi numar.
+// METODA - update: declarata in include/Display.h, la acelasi numar.
 bool Display::update() // Defineste transferul paginilor modificate catre OLED.
 { 
     if (!ready)                              // Refuza transmiterea inainte de initializare sau dupa un esec de comunicatie.
