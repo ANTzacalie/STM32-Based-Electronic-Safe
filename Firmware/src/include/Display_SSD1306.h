@@ -61,6 +61,12 @@ class Display
         // METODA 11: scrieRand - Primeste un rand 0..3 si un text, sterge numai acel rand din RAM si scrie noul text la inaltimea corespunzatoare. Nu afiseaza inca; pentru un rand invalid retine eroarea si iese.
         void scrieRand(uint8_t rand, const char* text); // Inlocuieste textul unui singur rand in RAM.
 
+        // METODA: setLuminozitate - Primeste direct contrastul 0..255 si trimite numai comanda SSD1306 de contrast, dupa verificarea initializarii. Nu sterge si nu redeseneaza textul; returneaza succesul comunicatiei.
+        bool setLuminozitate(uint8_t contrast); // Trimite direct contrastul 0..255.
+
+        // METODA: luminozitateMedie - Apeleaza setLuminozitate cu valoarea CONTRAST_MEDIU, adica 128, si returneaza rezultatul. Nu citeste taste si nu modifica imaginea.
+        bool luminozitateMedie(); // Cere valoarea medie aleasa pentru proiect.
+
 
         // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
         bool afiseaza(); // Trimite imaginea din RAM; nu o sterge dupa transmitere.
@@ -162,6 +168,9 @@ class Display
         static const uint8_t COMANDA_PAGINI = 0x22; // Selecteaza prima si ultima pagina de transfer.
         static const uint8_t PRIMA_PAGINA = 0; // Prima pagina de opt linii.
         static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
+        
+        static const uint8_t COMANDA_CONTRAST = 0x81; // Selecteaza valoarea contrastului OLED.
+        static const uint8_t CONTRAST_MEDIU = 128; // Contrastul mediu folosit in proiect.
         
         static const uint16_t LATIME = 128; // Numarul coloanelor de pixeli.
         static const uint8_t INALTIME = 32; // Numarul liniilor de pixeli.

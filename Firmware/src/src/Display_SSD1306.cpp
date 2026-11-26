@@ -230,6 +230,25 @@ bool Display::afiseaza() // Trimite simplu tot cadrul, fara dirtyPages sau compa
     return transmite(buffer, OCTETI_TRANSMISIE); // Trimite prefixul si cei 512 B; NU sterge bufferul dupa transmitere.
 } 
 
+// METODA: setLuminozitate - Primeste direct contrastul 0..255 si trimite numai comanda SSD1306 de contrast, dupa verificarea initializarii. Nu sterge si nu redeseneaza textul; returneaza succesul comunicatiei.
+bool Display::setLuminozitate(uint8_t contrast) // Primeste direct o valoare de contrast 0..255, nu un indice de tablou.
+{ // schimbarea contrastului.
+    if (verificaInitializare() == false) // Nu trimite pe un periferic neinitializat; nu goleste ecranul.
+    { // Deschide cazul in care nu putem comunica.
+        return false; // Pastreaza imaginea si diagnosticul existent.
+    } 
+    uint8_t comenzi[] = {CONTROL_COMENZI, COMANDA_CONTRAST, contrast}; // Pregateste doar comanda de contrast si valoarea ceruta.
+    return transmite(comenzi, uint16_t(sizeof comenzi)); // Trimite schimbarea fara clear, redesenare sau modificarea Password-ului.
+} 
+
+// METODA: luminozitateMedie - Apeleaza setLuminozitate cu valoarea CONTRAST_MEDIU, adica 128, si returneaza rezultatul. Nu citeste taste si nu modifica imaginea.
+bool Display::luminozitateMedie() // O metoda mica pentru treapta medie.
+{ // cererea treptei medii.
+    return setLuminozitate(CONTRAST_MEDIU); // Nu numara apasari pe # si nu decide standby-ul.
+} 
+
+
+
 
 
 // METODA: setPornit - Trimite comanda ON daca pornit=true sau OFF daca este false, dupa verificarea initializarii. Nu intrerupe alimentarea fizica si nu sterge bufferul imaginii; returneaza succesul transferului.
