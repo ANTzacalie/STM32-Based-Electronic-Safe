@@ -157,6 +157,28 @@ void Display::deseneazaPixel(int x, int y, bool aprins) // Modifica un singur bi
     } 
 } 
 
+// METODA 09: scrieCaracter - Primeste un caracter si pozitia lui, transforma literele mici in mari si deseneaza cinci coloane de font plus una libera. Inlocuieste si pixelii stinsi ai celulei de 6x8, fara actualizare fizica.
+void Display::scrieCaracter(int x, int y, char caracter) // Deseneaza o singura litera/cifra, in locul unei functii mari pentru tot textul.
+{ // pregatirea caracterului.
+    if (caracter >= 'a' && caracter <= 'z') // Recunoaste literele mici ASCII.
+    { // conversia pentru refolosirea fontului.
+        caracter = char(caracter - 'a' + 'A'); // Transforma litera mica in mare; nu pastram un al doilea font.
+    } 
+
+    for (uint8_t coloana = 0; coloana < 6; coloana++) // Parcurge cinci coloane de litera si o coloana libera.
+    { // desenarea unei coloane.
+        uint8_t valoare = 0; // Coloana libera si caracterele necunoscute pornesc goale.
+       
+        if (coloana < 5) // Numai primele cinci coloane apartin desenului caracterului.
+        { // citirea fontului.
+            valoare = coloanaCaracter(caracter, coloana); // Citeste o singura coloana din tabel.
+        } 
+        deseneazaColoana(x + coloana, y, valoare); // Deseneaza coloana prin metoda mica deja explicata.
+    } 
+} 
+
+
+
 
 
 //metoda  - setBrightness: declarata in Display.h, la acelasi numar
@@ -205,7 +227,7 @@ void Display::clear() //Defineste stergerea memoriei grafice locale
 
  
 
-// METODA 09 - drawText: declarata in include/Display.h, la acelasi numar.
+// METODA - drawText: declarata in include/Display.h, la acelasi numar.
 void Display::drawText(int x, int y, const char* value) // Defineste desenarea unui sir primit din exterior.
 { 
     if (value == nullptr || x < 0 || y < 0 || y >= 32)  // Respinge pointerul nul si originea din afara zonei verticale sau la stanga panoului.

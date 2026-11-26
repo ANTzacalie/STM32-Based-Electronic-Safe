@@ -52,6 +52,11 @@ class Display
         // METODA 08: deseneazaPixel - Primeste coordonatele x/y si starea aprins, gaseste octetul si bitul pixelului, apoi aprinde sau stinge numai acel bit in RAM. Ignora coordonatele din afara panoului si nu transmite pe I2C.
         void deseneazaPixel(int x, int y, bool aprins = true); // Modifica un pixel in buffer, fara transmisie I2C.
 
+        // METODA 09: scrieCaracter - Primeste un caracter si pozitia lui, transforma literele mici in mari si deseneaza cinci coloane de font plus una libera. Inlocuieste si pixelii stinsi ai celulei de 6x8, fara actualizare fizica.
+        void scrieCaracter(int x, int y, char caracter); // Deseneaza un singur caracter si spatiul lui liber.
+
+
+
         // METODA: afiseaza - Verifica initializarea, selecteaza toate coloanele/paginile si trimite bufferul de 513 B: un octet de control plus 512 B de imagine. Returneaza succesul I2C si nu sterge imaginea dupa transmitere.
         bool afiseaza(); // Trimite imaginea din RAM; nu o sterge dupa transmitere.
 
@@ -85,7 +90,7 @@ class Display
         //METODA - drawPixel: definitia este in src/Display.cpp, la acelasi numar
         void drawPixel(int x, int y, bool on = true);   //aprinde/stinge un pixel valid din buffer; implicit on=true
 
-        //METODA 09 - update: definitia este in src/Display.cpp, la acelasi numar
+        //METODA - update: definitia este in src/Display.cpp, la acelasi numar
         bool update();   //trimite paginile modificate catre OLED; false inseamna ca OLED-ul nu a raspuns sau a esuat transferul
         
         //METODA 10 - drawText: definitia este in src/Display.cpp, la acelasi numar
@@ -168,10 +173,15 @@ class Display
         // METODA: configureazaOLED - Construieste pachetul de comenzi numite pentru SSD1306 128x32: orientare, adresare, contrast initial si parametrii panoului. Il trimite prin transmite si returneaza rezultatul; nu porneste aici logica seifului.
         bool configureazaOLED(); // Trimite secventa SSD1306 pentru 128x32.
 
+        // METODA: coloanaCaracter - Primeste un caracter pregatit si o coloana interna 0..4 si returneaza masca celor opt pozitii verticale din font. Cauta litere/cifre/semne si returneaza zero pentru spatiu sau simbol nesuportat; nu deseneaza singura.
+        uint8_t coloanaCaracter(char caracter, uint8_t coloana) const; // Citeste cinci coloane de font, fara hardware.
 
+        // METODA: deseneazaColoana - Primeste pozitia si un octet de font, verifica pe rand cei opt biti si apeleaza deseneazaPixel cu starea aprins/stins. Modifica o singura coloana in RAM, fara transmisie I2C.
+        void deseneazaColoana(int x, int y, uint8_t valoare); // Deseneaza cei sapte pixeli ai unei coloane de caracter.
 
-
-
+       
+       
+       
         // METODA  - drawBattery: definitia este in src/Display.cpp, la acelasi numar.
         void drawBattery(bool valid, uint8_t percent); // Deseneaza pictograma din datele primite; procent invalid inseamna semnul intrebarii.
 
