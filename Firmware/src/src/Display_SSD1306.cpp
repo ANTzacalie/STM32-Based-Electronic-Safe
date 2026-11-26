@@ -231,6 +231,31 @@ bool Display::afiseaza() // Trimite simplu tot cadrul, fara dirtyPages sau compa
 } 
 
 
+
+// METODA: setPornit - Trimite comanda ON daca pornit=true sau OFF daca este false, dupa verificarea initializarii. Nu intrerupe alimentarea fizica si nu sterge bufferul imaginii; returneaza succesul transferului.
+bool Display::setPornit(bool pornit) // Controleaza doar afisarea panoului, nu alimentarea fizica a modulului.
+{ // alegerea comenzii ON/OFF.
+    if (verificaInitializare() == false) // Cere comunicatie pregatita.
+    { // cazul unei comunicatii indisponibile.
+        return false; // Nu trimite si nu sterge bufferul.
+    } 
+    
+    uint8_t comenzi[] = {CONTROL_COMENZI, COMANDA_OPRIRE}; // Pregateste implicit comanda de stingere a panoului.
+    if (pornit == true) // Verifica daca apelantul a cerut aprinderea.
+    { // cazul pornirii.
+        comenzi[1] = COMANDA_PORNIRE; // Inlocuieste comanda OFF cu ON.
+    }
+    
+    return transmite(comenzi, uint16_t(sizeof comenzi)); // Trimite numai comanda, fara sa schimbe imaginea din RAM.
+} 
+
+
+
+
+
+
+///////////////////////////////////
+
 //metoda  - setBrightness: declarata in Display.h, la acelasi numar
 bool Display::setBrightness(uint8_t level) //Defineste transmiterea unei trepte
 {

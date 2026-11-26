@@ -150,9 +150,12 @@ class Display
 
         // Adresele si comenzile au nume proprii, ca sa nu fie ascunse in functii.
         static const uint8_t CONTROL_COMENZI = 0x00; // Prefix SSD1306: octetii urmatori sunt comenzi si parametri.
+        static const uint8_t COMANDA_OPRIRE = 0xAE; // Opreste afisarea panoului.
+        static const uint8_t COMANDA_PORNIRE = 0xAF; // Porneste afisarea panoului.
+        
+        
         static const uint8_t CONTROL_PIXELI = 0x40; // Prefix SSD1306: octetii urmatori sunt pixeli.
-        static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
-
+        
         static const uint8_t COMANDA_COLOANE = 0x21; // Selecteaza prima si ultima coloana de transfer.
         static const uint8_t PRIMA_COLOANA = 0; // Transferul imaginii incepe din coloana zero.
         static const uint8_t ULTIMA_COLOANA = 127; // Ultima coloana a OLED-ului 128x32.
