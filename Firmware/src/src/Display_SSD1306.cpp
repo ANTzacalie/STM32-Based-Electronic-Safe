@@ -305,6 +305,27 @@ bool Display::initializareI2C() // Pregateste perifericul I2C1 folosit exclusiv 
     return true; // Confirma configurarea I2C, nu si prezenta OLED-ului.
 } 
 
+// METODA: cautaOLED - Incearca adresele numite 0x3C si 0x3D, transformate in format HAL, si pastreaza adresa care raspunde. Returneaza true la primul ACK; altfel memoreaza DisplayFaraRaspuns si returneaza false.
+bool Display::cautaOLED() // Incearca cele doua adrese definite explicit in header.
+{ // detectarea adresei OLED.
+    adresaHAL = uint16_t(ADRESA_OLED_PRINCIPALA * 2); // HAL cere adresa pe sapte biti deplasata cu un bit, echivalent cu inmultirea cu doi.
+    
+    if (HAL_I2C_IsDeviceReady(&i2c, adresaHAL, 1, TIMEOUT_I2C_MS) == HAL_OK) // Incearca prima adresa cu timeout finit.
+    { // cazul adresei principale confirmate.
+        return true; // Pastreaza adresa care a raspuns si termina cautarea.
+    } 
+    adresaHAL = uint16_t(ADRESA_OLED_ALTERNATIVA * 2); // Pregateste in format HAL a doua adresa posibila.
+   
+    if (HAL_I2C_IsDeviceReady(&i2c, adresaHAL, 1, TIMEOUT_I2C_MS) == HAL_OK) // Incearca si adresa alternativa.
+    { // cazul adresei alternative confirmate.
+        return true; // Pastreaza adresa alternativa si termina cautarea.
+    } 
+    setEroare(EroareDisplay::DisplayFaraRaspuns); // Nicio adresa nu a raspuns; poate fi alimentare, cablaj sau alt modul.
+    return false; // Nu continuam initializarea fara un raspuns de la dispozitiv.
+} 
+
+
+
 
 
 

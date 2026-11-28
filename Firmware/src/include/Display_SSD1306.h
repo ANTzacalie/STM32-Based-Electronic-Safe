@@ -136,6 +136,7 @@ class Display
 
     private:
         I2C_HandleTypeDef i2c = {};                                     //Pregateste handle-ul de configurare cerut de HAL, cu toate campurile initial zero
+        uint16_t adresaHAL = 0; // Adresa dispozitivului, in formatul cerut de HAL, stabilita la detectare.
         uint16_t address = 0;                                           //Adresa OLED in format HAL; se stabileste dupa raspuns la 0x3C sau 0x3D pe 7 biti
         bool initializat = false; // Inlocuieste numele ready; indica pregatirea comunicatiei, nu daca exista deja text pe ecran.
         bool limbaEngleza = false; // False inseamna texte in romana, true inseamna engleza.
@@ -155,6 +156,9 @@ class Display
         
 
         // Adresele si comenzile au nume proprii, ca sa nu fie ascunse in functii.
+        static const uint8_t ADRESA_OLED_PRINCIPALA = 0x3C; // Prima adresa I2C incercata, pe sapte biti.
+        static const uint8_t ADRESA_OLED_ALTERNATIVA = 0x3D; // A doua adresa I2C incercata.
+        
         static const uint8_t CONTROL_COMENZI = 0x00; // Prefix SSD1306: octetii urmatori sunt comenzi si parametri.
         static const uint8_t COMANDA_OPRIRE = 0xAE; // Opreste afisarea panoului.
         static const uint8_t COMANDA_PORNIRE = 0xAF; // Porneste afisarea panoului.
@@ -178,6 +182,7 @@ class Display
         static const uint16_t OCTETI_IMAGINE = 512; // Memoria imaginii: 128*32/8.
         static const uint16_t OCTETI_TRANSMISIE = 513; // Imaginea plus un octet de control I2C.
         static const uint32_t VITEZA_I2C = 100000; // Frecventa magistralei, in Hz.
+        static const uint32_t TIMEOUT_I2C_MS = 100; // Limita de asteptare a unui transfer HAL, in milisecunde.
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
 
