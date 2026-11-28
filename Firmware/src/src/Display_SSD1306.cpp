@@ -268,7 +268,42 @@ bool Display::setPornit(bool pornit) // Controleaza doar afisarea panoului, nu a
     return transmite(comenzi, uint16_t(sizeof comenzi)); // Trimite numai comanda, fara sa schimbe imaginea din RAM.
 } 
 
+// METODA: initializarePini - Activeaza ceasurile GPIOB/AFIO, pastreaza I2C1 neremapat si configureaza PB6/PB7 ca alternate function open-drain prin HAL. 
+void Display::initializarePini() // Configureaza numai cei doi pini ai display-ului.
+{ // configurarea GPIO prin HAL.
+    __HAL_RCC_GPIOB_CLK_ENABLE(); // Activeaza ceasul portului B.
+    __HAL_RCC_AFIO_CLK_ENABLE(); // Permite configurarea functiei alternative a perifericului.
+    __HAL_AFIO_REMAP_I2C1_DISABLE(); // Pastreaza I2C1 pe PB6/PB7, nu pe pinii remapati.
+    GPIO_InitTypeDef pini = {}; // Structura impusa de HAL, nu o structura proprie de logica.
+    pini.Pin = GPIO_PIN_6 | GPIO_PIN_7; // Selecteaza PB6=SCL si PB7=SDA impreuna.
+    pini.Mode = GPIO_MODE_AF_OD; // Selecteaza functia alternativa open-drain folosita de I2C.
+    pini.Pull = GPIO_NOPULL; // Nu cere rezistente interne; pull-up-urile externe ale I2C trebuie verificate pe placa.
+    pini.Speed = GPIO_SPEED_FREQ_HIGH; // Configureaza viteza de comutare a pinilor, nu frecventa magistralei.
+    HAL_GPIO_Init(GPIOB, &pini); // Aplica aceasta configuratie pe portul B prin HAL.
+}
 
+// METODA: initializareI2C - Activeaza I2C1, completeaza handle-ul HAL pentru 100 kHz si adrese pe sapte biti, apoi aplica HAL_I2C_Init. Returneaza true la succes sau false cu InitializareI2CEsuata memorata; nu detecteaza OLED-ul.
+bool Display::initializareI2C() // Pregateste perifericul I2C1 folosit exclusiv de OLED in acest modul.
+{ // incepe configurarea handle-ului HAL.
+    __HAL_RCC_I2C1_CLK_ENABLE(); // Activeaza ceasul perifericului I2C1.
+    i2c.Instance = I2C1; // Selecteaza perifericul, fara scrieri manuale la adrese de registre.
+    i2c.Init.ClockSpeed = VITEZA_I2C; // Cere 100 kHz, valoare numita in header.
+    i2c.Init.DutyCycle = I2C_DUTYCYCLE_2; // Completeaza parametrul cerut de HAL.
+    i2c.Init.OwnAddress1 = 0; // Nu folosim o adresa proprie a STM32 ca dispozitiv slave.
+    i2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT; // Selecteaza adresarea I2C pe sapte biti.
+    i2c.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE; // Nu folosim o a doua adresa proprie.
+    i2c.Init.OwnAddress2 = 0; // Initializeaza si valoarea adresei proprii secundare.
+    i2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE; // Dezactiveaza raspunsul la general-call.
+    i2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE; // Lasa optiunea NoStretch dezactivata.
+    
+    if (HAL_I2C_Init(&i2c) != HAL_OK) // Verifica rezultatul configurarii magistralei.
+    { // incepe tratarea configurarii esuate.
+        setEroare(EroareDisplay::InitializareI2CEsuata); // Memoreaza eroarea de initializare, nu o eroare de Password.
+        return false; // Opreste pornirea display-ului.
+    } 
+
+    return true; // Confirma configurarea I2C, nu si prezenta OLED-ului.
+} 
 
 
 

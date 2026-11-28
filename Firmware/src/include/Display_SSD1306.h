@@ -177,6 +177,7 @@ class Display
 
         static const uint16_t OCTETI_IMAGINE = 512; // Memoria imaginii: 128*32/8.
         static const uint16_t OCTETI_TRANSMISIE = 513; // Imaginea plus un octet de control I2C.
+        static const uint32_t VITEZA_I2C = 100000; // Frecventa magistralei, in Hz.
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
 
