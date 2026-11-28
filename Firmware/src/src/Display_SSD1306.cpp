@@ -380,6 +380,23 @@ bool Display::transmite(uint8_t* date, uint16_t lungime) // Singura functie care
     return true; // Confirma transferul, nu starea mecanica sau autorizarea seifului.
 } 
 
+// METODA: setEroare - Primeste o valoare EroareDisplay si o memoreaza in ultimaEroare, pentru consultarea prin getLastError. Nu afiseaza mesaje si nu efectueaza recuperare automata.
+void Display::setEroare(EroareDisplay eroare) // Primeste o eroare de memorat, ca in exemplul lui Antonio.
+{ // metoda de memorare.
+    ultimaEroare = eroare; // Inlocuieste ultima eroare a acestui obiect.
+}
+
+// METODA: verificaInitializare - Returneaza false daca initializat este false sau true daca putem incerca o comanda de afisaj. Nu trimite pe I2C, nu reface initializarea si nu sterge bufferul ori imaginea vizibila.
+bool Display::verificaInitializare() // Verifica pregatirea comunicatiei intr-un singur loc.
+{ // verificarea inlocuitoare pentru conditiile repetate cu ready.
+    if (initializat == false) // Daca OLED-ul nu a fost pregatit sau comunicatia a esuat, nu transmitem.
+    { // cazul in care nu putem folosi I2C pentru afisaj.
+        return false; // Opreste doar apelul curent; nu sterge bufferul si nu stinge ecranul.
+    } 
+    return true; // Permite metoda care vrea sa trimita date catre OLED.    
+}
+
+
 
 
 
