@@ -15,14 +15,19 @@ enum class EroareDisplay : uint8_t //lista de erori cu valori pe un octet
                                 //Verificare configurare I2C1 si a pinilor PB6/PB7, acest cod nu spune singur cauza exacta
     DisplayFaraRaspuns,         //Nu s-a primit raspuns de la OLED
                                 //Diferite erori: fire conectate gresit, lipsa alimentarii, alta adrese sau o problema pe magistrala I2C
+    TimeoutI2C,                 // A expirat timpul acordat unei transmisii HAL.
+    TransferComenziEsuat,       //HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
+                                //Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
+    TransferImagineEsuat,       // HAL nu a putut trimite imaginea de pixeli.
+    
+    
     ComenziInvalide,            //Comenzi gresite; Nu se trimite pachetul pentru ca sursa lipsest sau nu incape in tabloul rezervat comenzilor
     LuminozitateInvalida,       //setBrightness a primit alta valoare decat 0=minim, 1=mediu sau 2=maxim
     TransferPixeliEsuat,        //HAL nu a reusit sa trimita un pachet cu pixelii care trebuie afisati.
     DatePinInvalide,            //showPin a primit mai mult de 12 cifre de desenat sau mai mult de 3 incercari de afisat.   
     IncercariInvalide,          //showPinIncorrect a primit mai mult de 3 incercari ramase pentru mesajul de pe ecran.                         
 
-    TransferComenziEsuat,       //HAL nu a reusit sa trimita comenzile sau parametrii catre controlerul SSD1306.
-                                //Se poate intampla la initializare, la schimbarea contrastului sau la selectarea paginii de pixeli.
+    
     ParametruInvalid // Un rand, o lungime Password sau o valoare de afisat nu este permisa.
 
 };

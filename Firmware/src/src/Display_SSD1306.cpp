@@ -349,6 +349,36 @@ bool Display::configureazaOLED() // Pregateste comenzile SSD1306 pentru un panou
     return transmite(comenzi, uint16_t(sizeof comenzi)); // Trimite secventa; sizeof numara octetii tabloului.
 } 
 
+// METODA: transmite - Primeste un pachet intern si lungimea lui si il trimite prin HAL_I2C_Master_Transmit cu timeout de 100 ms. La esec retrage initializat si retine timeout/comenzi/imagine; la succes retine NicioEroare si returneaza true.
+bool Display::transmite(uint8_t* date, uint16_t lungime) // Singura functie care transmite un pachet de comenzi sau pixeli.
+{ // incepe transportul I2C.
+    HAL_StatusTypeDef rezultat = HAL_I2C_Master_Transmit(&i2c, adresaHAL, date, lungime, TIMEOUT_I2C_MS); // Asteapta sincron transferul, cel mult timpul numit in header.
+    
+    if (rezultat != HAL_OK) // Verifica daca HAL a raportat o problema.
+    { // deschide tratarea erorii de transport.
+        initializat = false; // Cere reinitializare inainte de urmatoarele transmisii publice.
+        
+        if (rezultat == HAL_TIMEOUT) // Separa expirarea asteptarii de celelalte erori HAL.
+        { // cazul timeout-ului.
+            setEroare(EroareDisplay::TimeoutI2C); // Memoreaza eroarea de timp expirat.
+        }
+        
+        else if (date[0] == CONTROL_COMENZI) // Prefixul arata daca pachetul continea comenzi.
+        { // cazul unei comenzi netransmise.
+            setEroare(EroareDisplay::TransferComenziEsuat); // Memoreaza esecul comenzilor SSD1306.
+        } 
+        
+        else // Celalalt pachet folosit de clasa contine imaginea.
+        { // cazul imaginii netransmise.
+            setEroare(EroareDisplay::TransferImagineEsuat); // Memoreaza esecul transmiterii pixelilor.
+        } 
+        
+        return false; // Metoda apelanta afla ca transferul nu s-a incheiat cu succes.
+    }
+
+    setEroare(EroareDisplay::NicioEroare); // Marcheaza transferul reusit.
+    return true; // Confirma transferul, nu starea mecanica sau autorizarea seifului.
+} 
 
 
 
