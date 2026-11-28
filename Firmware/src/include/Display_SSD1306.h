@@ -162,8 +162,33 @@ class Display
         static const uint8_t CONTROL_COMENZI = 0x00; // Prefix SSD1306: octetii urmatori sunt comenzi si parametri.
         static const uint8_t COMANDA_OPRIRE = 0xAE; // Opreste afisarea panoului.
         static const uint8_t COMANDA_PORNIRE = 0xAF; // Porneste afisarea panoului.
-        
-        
+        static const uint8_t COMANDA_CEAS = 0xD5; // Selecteaza configurarea ceasului intern OLED.
+        static const uint8_t VALOARE_CEAS = 0x80; // Valoarea folosita pentru ceasul intern OLED.
+        static const uint8_t COMANDA_MULTIPLEX = 0xA8; // Selecteaza numarul liniilor panoului.
+        static const uint8_t MULTIPLEX_32_LINII = 0x1F; // Pentru 32 de linii se transmite 32-1.
+        static const uint8_t COMANDA_OFFSET = 0xD3; // Selecteaza deplasarea verticala.
+        static const uint8_t OFFSET_ZERO = 0x00; // Nu deplaseaza vertical imaginea.
+        static const uint8_t COMANDA_LINIE_START = 0x40; // Incepe afisarea de la prima linie a memoriei.
+        static const uint8_t COMANDA_POMPA = 0x8D; // Selecteaza pompa de sarcina a SSD1306.
+        static const uint8_t POMPA_ACTIVA = 0x14; // Activeaza pompa interna a modulului OLED.
+        static const uint8_t COMANDA_ADRESARE = 0x20; // Selecteaza modul de adresare a memoriei OLED.
+        static const uint8_t ADRESARE_ORIZONTALA = 0x00; // Scrierea avanseaza prin coloane si apoi pagini.
+        static const uint8_t COMANDA_ORIENTARE_X = 0xA1; // Stabileste orientarea segmentelor.
+        static const uint8_t COMANDA_ORIENTARE_Y = 0xC8; // Stabileste sensul scanarii liniilor COM.
+        static const uint8_t COMANDA_CONFIG_COM = 0xDA; // Selecteaza configuratia liniilor COM.
+        static const uint8_t CONFIG_COM_32 = 0x02; // Configuratia folosita pentru panoul 128x32.
+        static const uint8_t COMANDA_CONTRAST = 0x81; // Selecteaza valoarea contrastului OLED.
+        static const uint8_t CONTRAST_MINIM = 1; // Contrastul minim folosit in proiect, fara oprirea panoului.
+        static const uint8_t CONTRAST_MEDIU = 128; // Contrastul mediu folosit in proiect.
+        static const uint8_t CONTRAST_MAXIM = 255; // Contrastul maxim.
+        static const uint8_t COMANDA_PREINCARCARE = 0xD9; // Selecteaza intervalul de preincarcare.
+        static const uint8_t VALOARE_PREINCARCARE = 0xF1; // Parametrul de preincarcare pentru modulul alimentat cu pompa interna.
+        static const uint8_t COMANDA_VCOMH = 0xDB; // Selecteaza nivelul VCOMH.
+        static const uint8_t VALOARE_VCOMH = 0x20; // Valoarea VCOMH folosita in modelul partajat.
+        static const uint8_t COMANDA_AFISARE_RAM = 0xA4; // Afiseaza continutul memoriei, nu modul toti-pixelii-aprinsi.
+        static const uint8_t COMANDA_NORMAL = 0xA6; // Foloseste pixeli normali, fara inversare.
+        static const uint8_t COMANDA_OPRIRE_SCROLL = 0x2E; // Dezactiveaza deplasarea automata a imaginii.
+
         static const uint8_t CONTROL_PIXELI = 0x40; // Prefix SSD1306: octetii urmatori sunt pixeli.
         
         static const uint8_t COMANDA_COLOANE = 0x21; // Selecteaza prima si ultima coloana de transfer.
@@ -173,8 +198,6 @@ class Display
         static const uint8_t PRIMA_PAGINA = 0; // Prima pagina de opt linii.
         static const uint8_t ULTIMA_PAGINA = 3; // A patra si ultima pagina de opt linii.
         
-        static const uint8_t COMANDA_CONTRAST = 0x81; // Selecteaza valoarea contrastului OLED.
-        static const uint8_t CONTRAST_MEDIU = 128; // Contrastul mediu folosit in proiect.
         
         static const uint16_t LATIME = 128; // Numarul coloanelor de pixeli.
         static const uint8_t INALTIME = 32; // Numarul liniilor de pixeli.

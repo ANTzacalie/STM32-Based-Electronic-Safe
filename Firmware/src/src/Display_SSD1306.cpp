@@ -324,6 +324,30 @@ bool Display::cautaOLED() // Incearca cele doua adrese definite explicit in head
     return false; // Nu continuam initializarea fara un raspuns de la dispozitiv.
 } 
 
+// METODA: configureazaOLED - Construieste pachetul de comenzi numite pentru SSD1306 128x32: orientare, adresare, contrast initial si parametrii panoului. Il trimite prin transmite si returneaza rezultatul; nu porneste aici logica seifului.
+bool Display::configureazaOLED() // Pregateste comenzile SSD1306 pentru un panou de 128x32.
+{ // incepe configurarea controlerului OLED, nu a logicii seifului.
+    uint8_t comenzi[] = { // Lista de comenzi foloseste numai numele definite in header.
+        CONTROL_COMENZI, // Primul octet spune ca urmeaza comenzi.
+        COMANDA_OPRIRE, // Opreste temporar panoul pe durata configurarii.
+        COMANDA_CEAS, VALOARE_CEAS, // Configureaza ceasul intern al SSD1306.
+        COMANDA_MULTIPLEX, MULTIPLEX_32_LINII, // Selecteaza cele 32 de linii ale display-ului.
+        COMANDA_OFFSET, OFFSET_ZERO, // Nu deplaseaza imaginea pe verticala.
+        COMANDA_LINIE_START, // Incepe imaginea de la prima linie.
+        COMANDA_POMPA, POMPA_ACTIVA, // Activeaza pompa interna a modulului.
+        COMANDA_ADRESARE, ADRESARE_ORIZONTALA, // Selecteaza organizarea transferului complet.
+        COMANDA_ORIENTARE_X, // Configureaza orientarea pe orizontala.
+        COMANDA_ORIENTARE_Y, // Configureaza orientarea pe verticala.
+        COMANDA_CONFIG_COM, CONFIG_COM_32, // Selecteaza conexiunile COM pentru 128x32.
+        COMANDA_CONTRAST, CONTRAST_MINIM, // Porneste cu contrast minim, ca preferinta initiala.
+        COMANDA_PREINCARCARE, VALOARE_PREINCARCARE, // Configureaza intervalul de preincarcare.
+        COMANDA_VCOMH, VALOARE_VCOMH, // Configureaza nivelul VCOMH ca in modelul partajat.
+        COMANDA_AFISARE_RAM, // Foloseste imaginea din memoria OLED.
+        COMANDA_NORMAL, // Afiseaza normal, fara inversare.
+        COMANDA_OPRIRE_SCROLL // Nu deplaseaza automat imaginea.
+    };
+    return transmite(comenzi, uint16_t(sizeof comenzi)); // Trimite secventa; sizeof numara octetii tabloului.
+} 
 
 
 
