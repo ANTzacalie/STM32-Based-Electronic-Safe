@@ -213,7 +213,8 @@ class Display
         static const uint32_t TIMEOUT_I2C_MS = 100; // Limita de asteptare a unui transfer HAL, in milisecunde.
         static const uint32_t STABILIZARE_OLED_MS = 100; // Pauza de pornire pentru stabilizarea OLED-ului.
 
-
+        static const uint8_t litere[26][5]; // Font constant pentru majusculele A..Z.
+        static const uint8_t cifre[10][5]; // Font constant pentru cifrele 0..9.
         static const uint8_t mastiPixeli[8]; // Valorile 1,2,4,...128, pentru cei opt biti ai unui octet.
 
         // METODA: setEroare - Primeste o valoare EroareDisplay si o memoreaza in ultimaEroare, pentru consultarea prin getLastError. Nu afiseaza mesaje si nu efectueaza recuperare automata.

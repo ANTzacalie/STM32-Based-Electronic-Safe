@@ -396,6 +396,73 @@ bool Display::verificaInitializare() // Verifica pregatirea comunicatiei intr-un
     return true; // Permite metoda care vrea sa trimita date catre OLED.    
 }
 
+// METODA: coloanaCaracter - Primeste un caracter pregatit si o coloana interna 0..4 si returneaza masca celor opt pozitii verticale din font. Cauta litere/cifre/semne si returneaza zero pentru spatiu sau simbol nesuportat; nu deseneaza singura.
+uint8_t Display::coloanaCaracter(char caracter, uint8_t coloana) const // Cauta o singura coloana din font.
+{ // incepe alegerea caracterului.
+    if (caracter >= 'A' && caracter <= 'Z') // Verifica daca este una dintre cele 26 de litere mari.
+    { // cazul unei litere.
+        return litere[caracter - 'A'][coloana]; // Transforma litera intr-un indice 0..25 si citeste coloana 0..4.
+    }
+
+    if (caracter >= '0' && caracter <= '9') // Verifica daca este una dintre cele zece cifre.
+    { // cazul unei cifre.
+        return cifre[caracter - '0'][coloana]; // Transforma cifra in indice 0..9 si citeste coloana.
+    }
+    
+    switch (caracter) // Alege semnele folosite de machetele seifului.
+    { // selectia semnelor.
+    
+    case '*': // Desenul asteriscului care mascheaza Password-ul.
+    { // tabloul local al asteriscului.
+        const uint8_t desen[] = {20, 8, 62, 8, 20}; // Cinci coloane, fiecare cu pixeli codificati pe biti.
+        return desen[coloana]; // Intoarce numai coloana ceruta.
+    }
+    
+    case '_': // Cursorul de introducere.
+        return 64; // Bitul 6 formeaza o linie jos in caracter.
+    
+    case '-': // Marcaj pentru campuri necunoscute sau minus.
+        return 8; // Bitul 3 formeaza o linie la mijloc.
+    
+    case ':': // Separatorul dintre minute si secunde.
+        if (coloana == 2) return 36; // Aprinde doua puncte in coloana centrala.
+        return 0; // Lasa goale celelalte coloane.
+    
+    case '.': // Separatorul optiunilor de meniu.
+        if (coloana == 2) return 64; // Aprinde punctul de jos in coloana centrala.
+        return 0; // Lasa goale celelalte coloane.
+    
+    case '/': // Separatorul datei sau al alternativelor.
+        return uint8_t(64 / mastiPixeli[coloana]); // Muta cate un pixel pe diagonala, folosind valorile 1,2,4,8,16.
+    
+    case '#': // Eticheta tastei de luminozitate, fara procesarea tastei.
+        if (coloana % 2 == 1) return 127; // Coloanele impare sunt pline.
+        return 20; // Celelalte coloane au doua linii orizontale.
+    
+    case '?': // Simbol pentru informatii necunoscute.
+    { // desenul semnului de intrebare.
+        const uint8_t desen[] = {2, 1, 81, 9, 6}; // Defineste cele cinci coloane ale semnului.
+        return desen[coloana]; // Returneaza coloana ceruta.
+    } 
+    
+    default: // Trateaza spatiul sau un caracter nesuportat de font.
+        return 0; // Foloseste o coloana goala, fara acces in afara tabelelor.
+    } 
+}
+
+// METODA: deseneazaColoana - Primeste pozitia si un octet de font, verifica pe rand cei opt biti si apeleaza deseneazaPixel cu starea aprins/stins. Modifica o singura coloana in RAM, fara transmisie I2C.
+void Display::deseneazaColoana(int x, int y, uint8_t valoare) // Deseneaza numai cei opt pixeli ai unei coloane de caracter.
+{ // incepe parcurgerea coloanei.
+    for (uint8_t linie = 0; linie < 8; linie++) // Parcurge cele opt pozitii verticale, cu un singur for simplu.
+    { // prelucrarea unui pixel.
+        bool aprins = false; // Presupune ca pixelul este stins.
+        if ((valoare & mastiPixeli[linie]) != 0) // Verifica bitul corespunzator liniei.
+        { // cazul unui bit aprins in font.
+            aprins = true; // Cere aprinderea pixelului.
+        }
+        deseneazaPixel(x, y + linie, aprins); // Deseneaza si pixelii stinsi, ca litera noua sa o inlocuiasca corect pe cea veche.
+    } 
+} 
 
 
 
